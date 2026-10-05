@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /student/
+Disallow: /admin/
+
+Sitemap: https://codevantage.in/sitemap.xml

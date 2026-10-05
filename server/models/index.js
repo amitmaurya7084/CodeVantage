@@ -1,0 +1,18 @@
+module.exports = {
+  Student: require("./Student"),
+  Admin: require("./Admin"),
+  Program: require("./Program"),
+  Task: require("./Task"),
+  Submission: require("./Submission"),
+  Review: require("./Review"),
+  Payment: require("./Payment"),
+  Certificate: require("./Certificate"),
+  Counter: require("./Counter"),
+  CertificateVerificationLog: require("./CertificateVerificationLog"),
+  ContactMessage: require("./ContactMessage"),
+  SiteContent: require("./SiteContent"),
+  Faq: require("./Faq"),
+  Media: require("./Media"),
+  Visit: require("./Visit"),
+  CertificateTemplateContent: require("./CertificateTemplateContent"),
+};

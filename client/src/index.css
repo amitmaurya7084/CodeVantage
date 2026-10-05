@@ -1,0 +1,93 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: "CertSignature";
+  src: url("./assets/fonts/GreatVibes-Regular.ttf") format("truetype");
+  font-display: swap;
+}
+
+:root {
+  --color-navy: #0f172a;
+  --color-brand: #2563eb;
+  --color-cyan: #06b6d4;
+  --color-surface: #f8fafc;
+  --color-muted: #64748b;
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-navy font-sans antialiased;
+}
+
+/* Visible keyboard focus state everywhere — accessibility requirement */
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+@layer components {
+  .input {
+    @apply w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm sm:text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand;
+  }
+
+  /* ---- Typography scale ----
+     One place that defines every heading/body size in the app. Every
+     page should reach for one of these instead of picking its own
+     text- or font- size combination, so hierarchy stays consistent at every
+     breakpoint. */
+
+  /* Hero-level headline — marketing/landing pages only (Home, Certificates,
+     ProgramDetail hero, etc.) */
+  .text-display {
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight;
+  }
+
+  /* Standard page title — one per page, for non-hero pages (Login, Legal,
+     Internships list, dashboard section titles). */
+  .text-h1 {
+    @apply text-2xl sm:text-3xl font-bold leading-tight;
+  }
+
+  /* Section heading — used inside a page to introduce a block of content.
+     Matches <SectionHeading>. */
+  .text-h2 {
+    @apply text-2xl sm:text-3xl md:text-4xl font-bold leading-tight;
+  }
+
+  /* Card / subsection heading. */
+  .text-h3 {
+    @apply text-base sm:text-lg font-semibold leading-snug;
+  }
+
+  /* Body copy — paragraphs, descriptions. */
+  .text-body {
+    @apply text-sm sm:text-base leading-relaxed;
+  }
+
+  /* Larger body copy — section-intro descriptions under a .text-h2, where
+     a bit more visual weight is wanted on bigger screens. */
+  .text-body-lg {
+    @apply text-sm sm:text-base md:text-lg leading-relaxed;
+  }
+
+  /* Secondary/small text — meta info, helper text, labels under fields. */
+  .text-caption {
+    @apply text-xs sm:text-sm leading-normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
