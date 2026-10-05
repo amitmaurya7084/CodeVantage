@@ -30,6 +30,10 @@ function normalizeError(err) {
 
 // eslint-disable-next-line no-unused-vars
 function errorHandler(err, req, res, next) {
+  // If a response has already started (e.g. an error after res.json()), we can't
+  // send another one — hand over to Express's default handler, which closes the connection.
+  if (res.headersSent) return next(err);
+
   const { statusCode, message } = normalizeError(err);
 
   // Log full detail server-side only

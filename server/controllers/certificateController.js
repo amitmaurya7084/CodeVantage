@@ -45,19 +45,31 @@ async function generateCertificateForStudent(studentId) {
     content,
   });
 
-  const certificate = await Certificate.create({
-    certificateId,
-    student: student._id,
-    program: student.program._id,
-    payment: payment._id,
-    studentNameSnapshot: student.fullName,
-    programNameSnapshot: student.program.name,
-    durationLabel: student.program.durationLabel,
-    completionDate,
-    qrCodeDataUrl,
-    verificationUrl,
-    pdfPath,
-  });
+  let certificate;
+  try {
+    certificate = await Certificate.create({
+      certificateId,
+      student: student._id,
+      program: student.program._id,
+      payment: payment._id,
+      studentNameSnapshot: student.fullName,
+      programNameSnapshot: student.program.name,
+      durationLabel: student.program.durationLabel,
+      completionDate,
+      qrCodeDataUrl,
+      verificationUrl,
+      pdfPath,
+    });
+  } catch (err) {
+    // Two requests (auto-generation after payment approval + the student's manual
+    // "generate" click) can race past the idempotency check above. The unique
+    // (student, program) index makes the loser fail here — return the winner's certificate.
+    if (err.code === 11000) {
+      const winner = await Certificate.findOne({ student: student._id, program: student.program._id });
+      if (winner) return winner;
+    }
+    throw err;
+  }
 
   student.certificateStatus = "generated";
   await student.save();

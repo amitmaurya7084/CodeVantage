@@ -29,9 +29,21 @@ connectDB();
 
 // ---- Security middleware ----
 app.use(helmet());
+// CLIENT_URL may hold one or several comma-separated frontend origins. Trailing
+// slashes are stripped because browsers send the Origin header without one —
+// "https://app.onrender.com/" in the env var would otherwise never match.
+const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
+  .split(",")
+  .map((o) => o.trim().replace(/\/+$/, ""))
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin(origin, callback) {
+      // No Origin header = same-origin / server-to-server / curl; allow.
+      if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(null, false); // browser blocks it; no crash, no stack trace
+    },
     credentials: true,
   })
 );
@@ -59,6 +71,12 @@ app.use(cookieParser());
 if (process.env.NODE_ENV !== "production") {
   app.use(morgan("dev"));
 }
+
+// Opening the bare backend URL in a browser (what people do right after a Render
+// deploy) used to show "Route not found: /". Give it a clear answer instead.
+app.get("/", (req, res) => {
+  res.json({ success: true, message: "CodeVantage API is running. All endpoints live under /api." });
+});
 
 // ---- Health check (also useful as an uptime-monitor / deployment-check target) ----
 app.get("/api/health", (req, res) => {

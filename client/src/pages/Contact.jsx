@@ -27,7 +27,7 @@ const DEFAULT_CONTACT_INFO = { supportEmail: "support@codevantage.in" };
 
 // IMAGE SLOT: set this to your illustration (e.g. "/images/contact-hero.png").
 // While it is null, a placeholder box is shown in its place.
-const CONTACT_HERO_IMAGE = "./images/hero-student.png";
+const CONTACT_HERO_IMAGE = "/images/hero-student.png";
 
 const SUBJECTS = ["Quick Support", "Program Guidance", "Certificate Queries", "General Inquiries"];
 

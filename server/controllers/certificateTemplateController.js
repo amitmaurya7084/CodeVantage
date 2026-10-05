@@ -1,5 +1,7 @@
 const { z } = require("zod");
 const path = require("path");
+const fs = require("fs");
+const crypto = require("crypto");
 const { CertificateTemplateContent } = require("../models");
 const { DEFAULT_TEMPLATE_CONTENT, generateCertificatePdf, OUTPUT_DIR } = require("../utils/pdfGenerator");
 const { generateVerificationQrCode } = require("../utils/qrCodeGenerator");
@@ -117,8 +119,6 @@ async function resetCertificateTemplateField(req, res, next) {
   }
 }
 
-const PREVIEW_PATH = path.join(OUTPUT_DIR, "_preview.pdf");
-
 /**
  * Validates one incoming preview field against the same shape rules as a
  * real save, but never rejects the whole request — an invalid or
@@ -164,6 +164,10 @@ async function previewCertificateTemplate(req, res, next) {
   try {
     const content = sanitizePreviewContent(req.body?.content);
     const previewCertificateId = "PREVIEW-0001";
+    // The admin UI fires previews while typing, so requests overlap. Each one gets
+    // its own temp file — a single shared "_preview.pdf" could be overwritten
+    // mid-send by the next request and serve a corrupt/partial PDF.
+    const previewPath = path.join(OUTPUT_DIR, `_preview-${crypto.randomUUID()}.pdf`);
     const { qrCodeDataUrl } = await generateVerificationQrCode(previewCertificateId);
 
     await generateCertificatePdf({
@@ -174,11 +178,14 @@ async function previewCertificateTemplate(req, res, next) {
       completionDate: new Date(),
       qrCodeDataUrl,
       content,
-      outputPath: PREVIEW_PATH,
+      outputPath: previewPath,
     });
 
     res.type("application/pdf");
-    res.sendFile(PREVIEW_PATH);
+    res.sendFile(previewPath, (sendErr) => {
+      fs.unlink(previewPath, () => {}); // temp file is single-use
+      if (sendErr && !res.headersSent) next(sendErr);
+    });
   } catch (err) {
     next(err);
   }

@@ -91,7 +91,7 @@ async function getAllPayments(req, res, next) {
     const query = status ? { status } : {};
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.min(100, parseInt(limit, 10) || 20);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
 
     const [payments, total] = await Promise.all([
       Payment.find(query)

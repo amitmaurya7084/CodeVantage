@@ -65,6 +65,7 @@ const certificateSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-certificateSchema.index({ student: 1 });
+// One certificate per student per program — also closes the generate-twice race condition
+certificateSchema.index({ student: 1, program: 1 }, { unique: true });
 
 module.exports = mongoose.model("Certificate", certificateSchema);

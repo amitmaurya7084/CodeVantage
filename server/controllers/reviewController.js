@@ -16,7 +16,7 @@ async function getSubmissionsQueue(req, res, next) {
     const query = status ? { status } : { status: { $in: ["Pending Review", "Under Review"] } };
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.min(100, parseInt(limit, 10) || 20);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
 
     const [submissions, total] = await Promise.all([
       Submission.find(query)
@@ -103,14 +103,22 @@ async function decideSubmission(req, res, next) {
 
     res.json({ success: true, message: `Submission marked as ${decision}.` });
 
-    const student = await Student.findById(submission.student);
-    const task = await Task.findById(submission.task);
-    const { subject, html } = reviewDecisionEmail(student, task.title, decision, comments);
-    sendEmail({ to: student.email, subject, html });
+    // The response is already sent above, so nothing below may throw into next(err).
+    // A task can be deleted by an admin after a submission exists, so task/student may be null.
+    try {
+      const student = await Student.findById(submission.student);
+      const task = await Task.findById(submission.task);
+      if (!student) return;
 
-    if (justBecameEligible) {
-      const eligibleEmail = allTasksApprovedEmail(student);
-      sendEmail({ to: student.email, subject: eligibleEmail.subject, html: eligibleEmail.html });
+      const { subject, html } = reviewDecisionEmail(student, task?.title || "your task", decision, comments);
+      sendEmail({ to: student.email, subject, html });
+
+      if (justBecameEligible) {
+        const eligibleEmail = allTasksApprovedEmail(student);
+        sendEmail({ to: student.email, subject: eligibleEmail.subject, html: eligibleEmail.html });
+      }
+    } catch (emailErr) {
+      console.error("Review notification email failed:", emailErr.message);
     }
   } catch (err) {
     next(err);

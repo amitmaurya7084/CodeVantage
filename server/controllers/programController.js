@@ -1,4 +1,5 @@
 const { Program, Task } = require("../models");
+const { escapeRegex } = require("../utils/escapeRegex");
 
 /** GET /api/programs — all active programs, for Home/Internships listing. Supports ?search= */
 async function getPrograms(req, res, next) {
@@ -7,7 +8,7 @@ async function getPrograms(req, res, next) {
     const query = { isActive: true };
 
     if (search) {
-      const regex = { $regex: search, $options: "i" };
+      const regex = { $regex: escapeRegex(search), $options: "i" };
       query.$or = [{ name: regex }, { shortDescription: regex }, { technologies: regex }];
     }
 

@@ -39,7 +39,7 @@ async function getMedia(req, res, next) {
     const query = type ? { type } : {};
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.min(100, parseInt(limit, 10) || 24);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 24));
 
     const [media, total] = await Promise.all([
       Media.find(query)

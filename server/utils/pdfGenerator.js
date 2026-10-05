@@ -66,6 +66,22 @@ const DEFAULT_TEMPLATE_CONTENT = {
   ],
 };
 
+/**
+ * Returns the largest font size (<= startSize, >= minSize) at which `text` fits
+ * inside `maxWidth`. Long student names / program names would otherwise wrap onto
+ * a second line and collide with the seal badge and the text below them.
+ */
+function fitFontSize(doc, text, fontName, startSize, minSize, maxWidth) {
+  let size = startSize;
+  doc.font(fontName);
+  while (size > minSize) {
+    doc.fontSize(size);
+    if (doc.widthOfString(text) <= maxWidth) break;
+    size -= 0.5;
+  }
+  return size;
+}
+
 function letterSpaced(text) {
   return text.split("").join(" ");
 }
@@ -334,7 +350,13 @@ function generateCertificatePdf({
     doc.moveTo(W / 2 + certifyW / 2 + 15, 163).lineTo(W / 2 + certifyW / 2 + 60, 163).strokeColor(COLORS.gold).lineWidth(1).stroke();
 
     // Candidate name (dynamic, per-certificate)
-    doc.font("Times-Bold").fontSize(36).fillColor(COLORS.navy).text(studentName, 0, 178, { align: "center" });
+    // Text area stops short of the seal badge on the right (its left edge is ~W-200).
+    const textMaxWidth = 400;
+    const nameSize = fitFontSize(doc, studentName, "Times-Bold", 36, 12, textMaxWidth);
+    // Centered by hand and drawn WITHOUT a `width` option: in this pdfkit version
+    // `lineBreak: false` does not stop wrapping when a width is given.
+    doc.font("Times-Bold").fontSize(nameSize).fillColor(COLORS.navy);
+    doc.text(studentName, (W - doc.widthOfString(studentName)) / 2, 178 + (36 - nameSize) * 0.85, { lineBreak: false });
     doc.moveTo(W / 2 - 110, 228).lineTo(W / 2 + 110, 228).strokeColor(COLORS.gold).lineWidth(1).stroke();
 
     // Program (dynamic)
@@ -342,11 +364,10 @@ function generateCertificatePdf({
     // Matches the reference design's phrasing ("Web Development Internship
     // Program") — no duration prefix. `durationLabel` is still accepted and
     // stored on the certificate record, just not shown in this sentence.
-    doc
-      .font("Helvetica-Bold")
-      .fontSize(19)
-      .fillColor(COLORS.blue)
-      .text(`${programName} Internship Program`, 0, 259, { align: "center" });
+    const programLine = `${programName} Internship Program`;
+    const programSize = fitFontSize(doc, programLine, "Helvetica-Bold", 19, 9, textMaxWidth);
+    doc.font("Helvetica-Bold").fontSize(programSize).fillColor(COLORS.blue);
+    doc.text(programLine, (W - doc.widthOfString(programLine)) / 2, 259 + (19 - programSize) / 2, { lineBreak: false });
     doc.font("Helvetica-Bold").fontSize(12).fillColor(COLORS.navy).text("at CodeVantage", 0, 283, { align: "center" });
 
     // Completion description (admin content)

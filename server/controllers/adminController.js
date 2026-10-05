@@ -1,4 +1,5 @@
 const { Student, Submission, Payment, Certificate } = require("../models");
+const { escapeRegex } = require("../utils/escapeRegex");
 
 /** GET /api/admin/dashboard — top-level platform stats */
 async function getDashboardStats(req, res, next) {
@@ -36,9 +37,10 @@ async function getStudents(req, res, next) {
 
     const query = {};
     if (search) {
+      const safeSearch = escapeRegex(search);
       query.$or = [
-        { fullName: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } },
+        { fullName: { $regex: safeSearch, $options: "i" } },
+        { email: { $regex: safeSearch, $options: "i" } },
       ];
     }
     if (program) query.program = program;
@@ -46,7 +48,7 @@ async function getStudents(req, res, next) {
     if (internshipStatus) query.internshipStatus = internshipStatus;
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
-    const limitNum = Math.min(100, parseInt(limit, 10) || 20);
+    const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 20));
 
     const [students, total] = await Promise.all([
       Student.find(query)

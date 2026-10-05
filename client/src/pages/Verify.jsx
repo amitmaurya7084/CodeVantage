@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Search, CheckCircle2, XCircle, Loader2 } from "lucide-react";
 import SectionHeading from "../components/ui/SectionHeading";
 import Card from "../components/ui/Card";
@@ -8,17 +9,20 @@ import Seo from "../components/Seo";
 import { verifyCertificate } from "../services/certificateService";
 
 function Verify() {
-  const [certificateId, setCertificateId] = useState("");
+  // The QR code on every certificate links to /verify/<certificateId>, so the ID
+  // may already be in the URL — in that case it is verified automatically.
+  const { certificateId: idFromUrl } = useParams();
+  const [certificateId, setCertificateId] = useState(idFromUrl || "");
   const [status, setStatus] = useState("idle"); // idle | loading | found | not_found | error
   const [result, setResult] = useState(null);
 
-  async function handleSubmit(e) {
-    e.preventDefault();
-    if (!certificateId.trim()) return;
+  const runVerification = useCallback(async (rawId) => {
+    const id = rawId.trim();
+    if (!id) return;
 
     setStatus("loading");
     try {
-      const data = await verifyCertificate(certificateId.trim());
+      const data = await verifyCertificate(id);
       if (data?.success && data?.certificate) {
         setResult(data.certificate);
         setStatus("found");
@@ -29,6 +33,18 @@ function Verify() {
       // Any network issue is shown honestly rather than faking a result.
       setStatus("error");
     }
+  }, []);
+
+  useEffect(() => {
+    if (idFromUrl) {
+      setCertificateId(idFromUrl);
+      runVerification(idFromUrl);
+    }
+  }, [idFromUrl, runVerification]);
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    runVerification(certificateId);
   }
 
   return (

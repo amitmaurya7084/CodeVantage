@@ -35,7 +35,12 @@ function TaskDetail() {
       .catch((err) => setError(err?.response?.data?.message || "Couldn't load this task."));
   }
 
-  useEffect(loadTask, [id]);
+  useEffect(() => {
+    setData(null);
+    setError(null);
+    loadTask();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   async function onSubmit(values) {
     try {

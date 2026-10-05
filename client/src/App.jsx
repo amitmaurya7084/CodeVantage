@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./components/layout/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
@@ -89,6 +89,7 @@ function App() {
           </ProtectedRoute>
         }
       >
+        <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="tasks" element={<Tasks />} />
         <Route path="tasks/:id" element={<TaskDetail />} />
@@ -107,6 +108,7 @@ function App() {
           </ProtectedAdminRoute>
         }
       >
+        <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="analytics" element={<AdminAnalytics />} />
         <Route path="students" element={<AdminStudents />} />
