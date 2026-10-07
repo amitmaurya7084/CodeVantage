@@ -27,6 +27,9 @@ const FIELD_GROUPS = [
 
 const PREVIEW_DEBOUNCE_MS = 900;
 
+// Shared look (taken from the certificate design): white-to-pale-blue card with a fine gold edge.
+const CARD_LOOK = "!bg-gradient-to-b from-white to-[#F4F8FF] !border !border-[#E4B95B]/50";
+
 function TextFieldCard({ field, value, onChange, onFieldSaved }) {
   const [isSaving, setIsSaving] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
@@ -60,9 +63,9 @@ function TextFieldCard({ field, value, onChange, onFieldSaved }) {
   }
 
   return (
-    <Card className="p-5">
+    <Card className={`p-5 ${CARD_LOOK}`}>
       <div className="flex items-center justify-between mb-3">
-        <p className="font-medium text-navy text-sm">{field.label}</p>
+        <p className="font-semibold text-navy text-sm">{field.label}</p>
         {!field.isEditable && (
           <span className="inline-flex items-center gap-1 text-xs text-muted">
             <Lock className="h-3 w-3" /> Protected
@@ -89,7 +92,7 @@ function TextFieldCard({ field, value, onChange, onFieldSaved }) {
       )}
 
       {field.isEditable && (
-        <div className="flex items-center gap-2 mt-3">
+        <div className="flex flex-wrap items-center gap-2 mt-3">
           <Button size="md" onClick={handleSave} disabled={!isDirty || isSaving}>
             <Save className="h-3.5 w-3.5" /> {isSaving ? "Saving..." : "Save"}
           </Button>
@@ -147,12 +150,12 @@ function TechStackCard({ field, value: items, onChange, onFieldSaved }) {
   }
 
   return (
-    <Card className="p-5">
-      <p className="font-medium text-navy text-sm mb-3">{field.label}</p>
+    <Card className={`p-5 ${CARD_LOOK}`}>
+      <p className="font-semibold text-navy text-sm mb-3">{field.label}</p>
 
       <div className="space-y-2 mb-4">
         {items.map((item, i) => (
-          <div key={i} className="flex items-center gap-2">
+          <div key={i} className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white p-1.5">
             <input
               type="color"
               value={item.color}
@@ -173,7 +176,7 @@ function TechStackCard({ field, value: items, onChange, onFieldSaved }) {
         ))}
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <Button size="md" variant="outline" onClick={addItem} disabled={items.length >= 10}>
           <Plus className="h-3.5 w-3.5" /> Add badge
         </Button>
@@ -223,9 +226,9 @@ function LivePreviewPanel({ draftValues, refreshToken }) {
   }, []);
 
   return (
-    <Card className="p-4 lg:sticky lg:top-6">
+    <Card className="p-4 lg:sticky lg:top-6 !border-2 !border-navy">
       <div className="flex items-center justify-between mb-3">
-        <p className="font-semibold text-navy text-sm">Live Preview</p>
+        <p className="font-serif font-bold text-navy">Live Preview</p>
         {isLoading && (
           <span className="inline-flex items-center gap-1.5 text-xs text-muted">
             <Loader2 className="h-3 w-3 animate-spin" /> Updating...
@@ -235,7 +238,7 @@ function LivePreviewPanel({ draftValues, refreshToken }) {
       <p className="text-xs text-muted mb-3">
         Uses placeholder candidate data ("Amit Kumar") so you can see your text changes before saving.
       </p>
-      <div className="aspect-[3/2] bg-surface rounded-lg overflow-hidden border border-slate-100">
+      <div className="aspect-[3/2] bg-surface rounded-sm overflow-hidden border-2 border-[#C9962B]">
         {previewUrl ? (
           <iframe title="Certificate preview" src={previewUrl} className="w-full h-full" />
         ) : (
@@ -282,17 +285,21 @@ function CertificateTemplate() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-navy mb-1">Certificate Template Content</h1>
+      <h1 className="inline-block font-serif text-2xl sm:text-3xl font-bold text-navy mb-2 pb-1 border-b-2 border-[#C9962B]">
+        Certificate Template Content
+      </h1>
       <p className="text-muted mb-8 max-w-2xl">
         Edit the certificate's text below — changes apply to every certificate generated once saved. The
         logo, border, seal, and overall design are fixed and can't be changed here.
       </p>
 
       <div className="grid lg:grid-cols-[1fr_380px] gap-8">
-        <div className="space-y-8">
+        <div className="space-y-8 min-w-0">
           {FIELD_GROUPS.map((group) => (
             <div key={group.title}>
-              <h2 className="text-sm font-semibold text-muted uppercase tracking-wide mb-3">{group.title}</h2>
+              <h2 className="text-xs font-semibold text-brand uppercase tracking-[0.25em] mb-3 pb-2 border-b border-[#E4B95B]/60">
+                {group.title}
+              </h2>
               <div className="space-y-4">
                 {group.fields.map((fieldName) => {
                   const field = byFieldName.get(fieldName);
@@ -320,7 +327,7 @@ function CertificateTemplate() {
           ))}
         </div>
 
-        <div>
+        <div className="min-w-0">
           <LivePreviewPanel draftValues={draftValues} refreshToken={refreshToken} />
           <Button
             size="md"
