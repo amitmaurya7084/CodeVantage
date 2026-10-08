@@ -37,21 +37,21 @@ const fmtDate = (d) =>
 
 function StatTile({ icon: Icon, value, label, tint, iconBox, iconColor }) {
   return (
-    <div className={`flex items-center gap-4 rounded-2xl border border-white p-4 sm:p-5 shadow-sm ${tint}`}>
-      <span className={`h-14 w-14 sm:h-16 sm:w-16 rounded-xl flex items-center justify-center flex-shrink-0 ${iconBox}`}>
-        <Icon className={`h-7 w-7 ${iconColor}`} />
+    <div className={`flex items-center gap-3 sm:gap-4 rounded-2xl border border-white p-3.5 sm:p-5 shadow-sm min-w-0 ${tint}`}>
+      <span className={`h-12 w-12 sm:h-16 sm:w-16 rounded-xl flex items-center justify-center flex-shrink-0 ${iconBox}`}>
+        <Icon className={`h-6 w-6 sm:h-7 sm:w-7 ${iconColor}`} />
       </span>
-      <div>
-        <p className="text-3xl font-bold text-navy leading-none">{value}</p>
-        <p className="text-muted mt-1.5">{label}</p>
+      <div className="min-w-0">
+        <p className="text-2xl sm:text-3xl font-bold text-navy leading-none">{value}</p>
+        <p className="text-sm sm:text-base text-muted mt-1.5">{label}</p>
       </div>
     </div>
   );
 }
 
-function InfoBox({ icon: Icon, iconBox, iconColor, label, children }) {
+function InfoBox({ icon: Icon, iconBox, iconColor, label, children, className = "" }) {
   return (
-    <div className="flex items-center gap-3 min-w-0">
+    <div className={`flex items-center gap-3 min-w-0 ${className}`}>
       <span className={`h-12 w-12 rounded-xl flex items-center justify-center flex-shrink-0 ${iconBox}`}>
         <Icon className={`h-5 w-5 ${iconColor}`} />
       </span>
@@ -64,10 +64,16 @@ function InfoBox({ icon: Icon, iconBox, iconColor, label, children }) {
 }
 
 /** Live preview of the exact PDF that "Download PDF" serves. Loads it as a blob so it shows
- *  inside the box even when the server sends it as an attachment. */
+ *  inside the box even when the server sends it as an attachment. The PDF is rendered at a fixed
+ *  A4-landscape size and scaled to whatever width the box has, so it stays fully responsive. */
+const PDF_W = 1123; // A4 landscape @96dpi
+const PDF_H = 794;
+
 function LivePdfPreview({ url }) {
   const [src, setSrc] = useState(null);
   const [failed, setFailed] = useState(false);
+  const [scale, setScale] = useState(0);
+  const boxRef = useRef(null);
 
   useEffect(() => {
     let objectUrl = null;
@@ -91,24 +97,42 @@ function LivePdfPreview({ url }) {
     };
   }, [url]);
 
-  if (!src && !failed) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center">
-        <Loader2 className="h-5 w-5 animate-spin text-brand" />
-      </div>
-    );
-  }
+  // Keep the scale in sync with the box width (window resize, sidebar toggle, rotation...).
+  useEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const update = () => setScale(el.clientWidth / PDF_W);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const frameSrc = src
     ? `${src}#toolbar=0&navpanes=0&scrollbar=0&view=Fit`
-    : `${url}${url.includes("?") ? "&" : "?"}inline=1#toolbar=0&navpanes=0&scrollbar=0&view=Fit`;
+    : failed
+      ? `${url}${url.includes("?") ? "&" : "?"}inline=1#toolbar=0&navpanes=0&scrollbar=0&view=Fit`
+      : null;
 
   return (
-    <iframe
-      title="Certificate preview"
-      src={frameSrc}
-      className="absolute inset-0 h-full w-full pointer-events-none border-0"
-    />
+    <div ref={boxRef} className="absolute inset-0 overflow-hidden bg-white">
+      {!frameSrc && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <Loader2 className="h-5 w-5 animate-spin text-brand" />
+        </div>
+      )}
+      {frameSrc && scale > 0 && (
+        <iframe
+          title="Certificate preview"
+          src={frameSrc}
+          width={PDF_W}
+          height={PDF_H}
+          scrolling="no"
+          className="border-0 pointer-events-none bg-white"
+          style={{ width: PDF_W, height: PDF_H, transform: `scale(${scale})`, transformOrigin: "top left" }}
+        />
+      )}
+    </div>
   );
 }
 
@@ -185,7 +209,7 @@ function Certificate() {
       <p className="text-muted mb-6">Track your certificate eligibility, payment status, and download your certificates.</p>
 
       {/* Stat tiles */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 min-[480px]:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 mb-6">
         <StatTile
           icon={Award}
           value={stats.earned}
@@ -275,10 +299,10 @@ function Certificate() {
         <>
           {/* Featured certificate */}
           <Card className="p-4 sm:p-6 !rounded-2xl">
-            <div className="flex flex-col xl:flex-row gap-6">
+            <div className="flex flex-col xl:flex-row gap-4 sm:gap-6">
               {/* Image box — put student.png in public/images/student.png.
-                  Stays 3:2 at every width, so it scales with the screen. */}
-              <div className="relative w-full xl:w-[44%] xl:max-w-[540px] flex-shrink-0 self-start aspect-[3/2] rounded-lg overflow-hidden border border-slate-200 bg-white shadow-sm">
+                  Keeps the A4-landscape ratio at every width, so it scales with the screen. */}
+              <div className="relative w-full xl:w-[44%] xl:max-w-[540px] flex-shrink-0 self-start aspect-[297/210] rounded-lg overflow-hidden border border-slate-200 bg-white shadow-sm">
                 {certificate.previewUrl ? (
                   <img src={certificate.previewUrl} alt="Certificate preview" className="h-full w-full object-cover" />
                 ) : (
@@ -290,13 +314,13 @@ function Certificate() {
                 <span className="inline-block rounded-full bg-blue-50 px-3.5 py-1.5 text-xs font-medium text-brand mb-3">
                   Internship Certificate
                 </span>
-                <p className="text-2xl font-bold text-navy">{programTitle}</p>
+                <p className="text-xl sm:text-2xl font-bold text-navy break-words">{programTitle}</p>
                 <p className="text-muted mt-2 max-w-xl">
                   This certificate is awarded for successfully completing the internship program with all required
                   tasks and submissions.
                 </p>
 
-                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 2xl:grid-cols-[auto_auto_1fr] gap-4 2xl:gap-5 [&>*:last-child]:sm:col-span-2 [&>*:last-child]:2xl:col-span-1">
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <InfoBox icon={Calendar} iconBox="bg-blue-50" iconColor="text-brand" label="Issue Date">
                     <p className="text-navy font-medium">{fmtDate(issueDate)}</p>
                   </InfoBox>
@@ -305,7 +329,7 @@ function Certificate() {
                       Generated
                     </span>
                   </InfoBox>
-                  <InfoBox icon={Hash} iconBox="bg-purple-50" iconColor="text-purple-600" label="Certificate ID">
+                  <InfoBox icon={Hash} iconBox="bg-purple-50" iconColor="text-purple-600" label="Certificate ID" className="sm:col-span-2">
                     <div className="flex items-center gap-3">
                       <p className="font-mono text-navy font-medium break-all">{certificate.certificateId}</p>
                       <button onClick={copyId} aria-label="Copy certificate ID" className="text-muted hover:text-brand flex-shrink-0">
@@ -315,7 +339,7 @@ function Certificate() {
                   </InfoBox>
                 </div>
 
-                <div className="mt-6 grid grid-cols-1 xs:grid-cols-2 gap-3 max-w-xl">
+                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-xl">
                   <a href={downloadMyCertificateUrl()} className="contents">
                     <Button className="w-full !py-3.5">
                       <Download className="h-4 w-4" /> Download PDF
@@ -333,13 +357,13 @@ function Certificate() {
 
           {/* All certificates */}
           <Card className="mt-6 p-4 sm:p-6 !rounded-2xl">
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 mb-4">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 mb-4">
               <div>
                 <p className="text-xl font-bold text-navy">All Certificates</p>
                 <p className="text-sm text-muted">View and manage all your earned certificates.</p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <div className="relative sm:w-72">
+              <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+                <div className="relative w-full sm:w-72">
                   <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted" />
                   <input
                     value={query}
@@ -351,7 +375,7 @@ function Certificate() {
                 <button
                   type="button"
                   onClick={() => setNewestFirst((v) => !v)}
-                  className="inline-flex items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-navy hover:border-brand/40"
+                  className="inline-flex w-full sm:w-auto items-center justify-between gap-3 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-navy hover:border-brand/40"
                 >
                   <span className="inline-flex items-center gap-2">
                     <ArrowUpDown className="h-4 w-4" /> {newestFirst ? "Newest First" : "Oldest First"}
@@ -361,8 +385,64 @@ function Certificate() {
               </div>
             </div>
 
-            <div className="overflow-x-auto rounded-lg border border-slate-200">
-              <table className="w-full min-w-[820px] text-left text-sm">
+            {/* Mobile / small tablet: card view */}
+            <div className="md:hidden space-y-3">
+              {showRow ? (
+                <div className="rounded-xl border border-slate-200 p-4">
+                  <div className="flex items-start gap-3">
+                    <span className="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                      <Laptop className="h-5 w-5 text-brand" />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold text-navy break-words">{programTitle}</p>
+                      {certificate.programCategory && (
+                        <span className="inline-block mt-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-xs text-muted">
+                          {certificate.programCategory}
+                        </span>
+                      )}
+                    </div>
+                    <span className="inline-block rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                      Generated
+                    </span>
+                  </div>
+                  <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <dt className="text-muted">Issue Date</dt>
+                      <dd className="text-navy font-medium">{fmtDate(issueDate)}</dd>
+                    </div>
+                    <div className="min-w-0">
+                      <dt className="text-muted">Certificate ID</dt>
+                      <dd className="text-navy font-medium flex items-center gap-2">
+                        <span className="break-all">{certificate.certificateId}</span>
+                        <button onClick={copyId} aria-label="Copy certificate ID" className="text-muted hover:text-brand flex-shrink-0">
+                          <Copy className="h-4 w-4" />
+                        </button>
+                      </dd>
+                    </div>
+                  </dl>
+                  <div className="mt-4 grid grid-cols-2 gap-2">
+                    <a
+                      href={downloadMyCertificateUrl()}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90"
+                    >
+                      <Download className="h-4 w-4" /> Download
+                    </a>
+                    <Link
+                      to={`/verify/${certificate.certificateId}`}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-navy hover:border-brand/40"
+                    >
+                      <ExternalLink className="h-4 w-4" /> Verify
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <p className="py-4 text-center text-muted">No certificates match your search.</p>
+              )}
+            </div>
+
+            {/* md and up: table view */}
+            <div className="hidden md:block overflow-x-auto rounded-lg border border-slate-200">
+              <table className="w-full min-w-[720px] text-left text-sm">
                 <thead className="bg-slate-50 text-navy">
                   <tr>
                     <th className="px-4 py-3 font-semibold w-12">#</th>
@@ -407,7 +487,7 @@ function Certificate() {
                         </span>
                       </td>
                       <td className="px-4 py-4">
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <a
                             href={downloadMyCertificateUrl()}
                             className="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
@@ -489,7 +569,7 @@ function UpiPaymentForm({ upiSettings, rejectedPayment, onSubmitted }) {
   }
 
   return (
-    <Card className="p-5 sm:p-6 max-w-2xl !rounded-2xl">
+    <Card className="p-4 sm:p-6 max-w-2xl !rounded-2xl">
       <div className="flex gap-4 mb-5">
         <CheckCircle2 className="h-6 w-6 text-success flex-shrink-0" />
         <div>
@@ -516,7 +596,7 @@ function UpiPaymentForm({ upiSettings, rejectedPayment, onSubmitted }) {
 
       <div className="bg-surface rounded-lg p-4 mb-5 text-center">
         {qrImageUrl ? (
-          <img src={qrImageUrl} alt="UPI payment QR code" className="w-44 h-44 mx-auto rounded-md bg-white p-2" />
+          <img src={qrImageUrl} alt="UPI payment QR code" className="w-40 h-40 sm:w-44 sm:h-44 mx-auto rounded-md bg-white p-2" />
         ) : (
           <div className="w-44 h-44 mx-auto rounded-md bg-white flex items-center justify-center border border-dashed border-slate-300">
             <QrCode className="h-10 w-10 text-muted" />
