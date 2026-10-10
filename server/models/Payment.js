@@ -47,13 +47,16 @@ const paymentSchema = new mongoose.Schema(
     },
     // --- Legacy Razorpay fields — kept so old paid records remain intact; no longer
     // written to by new code (see controllers/paymentController.js) ---
+    // NO `default: null` here on purpose. A default makes Mongoose write
+    // `razorpayOrderId: null` into EVERY new payment, and a unique index treats
+    // null as a real value — so the 2nd UPI payment collides with the 1st
+    // (E11000 duplicate key { razorpayOrderId: null }). Leaving the field absent
+    // for UPI payments avoids that.
     razorpayOrderId: {
       type: String,
-      default: null,
     },
     razorpayPaymentId: {
       type: String,
-      default: null,
     },
     razorpaySignature: {
       type: String,
@@ -86,10 +89,14 @@ const paymentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// sparse: only enforces uniqueness among documents that actually have this field —
-// legacy Razorpay orders keep their guarantee, while UPI records (which never set
-// this field) don't collide with each other.
-paymentSchema.index({ razorpayOrderId: 1 }, { unique: true, sparse: true });
+// Partial index instead of `sparse`: a sparse index still indexes documents where
+// the field is explicitly null (so existing records saved with null would still
+// collide). With $type: "string", only real Razorpay order ids are made unique;
+// null / missing values are never indexed, so UPI payments can't collide.
+paymentSchema.index(
+  { razorpayOrderId: 1 },
+  { unique: true, partialFilterExpression: { razorpayOrderId: { $type: "string" } } }
+);
 paymentSchema.index({ student: 1, status: 1 });
 // Prevents a student from having two "paid" records for the same program (duplicate payment)
 paymentSchema.index(
