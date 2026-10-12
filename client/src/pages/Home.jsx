@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 
 import {
-  ArrowRight, PlayCircle, Wallet, ClipboardCheck, TrendingUp, GraduationCap, Users, Handshake, Code2, Award,
-  Sparkles, Monitor, ShieldCheck, ChevronLeft, ChevronRight, Star, UserPlus, ListChecks, ClipboardList, Code,
-  UploadCloud, Search, BadgeCheck, CheckCircle2, GitBranch, Link2, Send, LayoutGrid, BookOpen, FolderOpen,
-  BarChart3, Rocket, FileBadge,
+  ArrowRight, PlayCircle, Boxes, Wallet, FolderGit2,ClipboardCheck, TrendingUp, GraduationCap, Users, Handshake, Code2, Award,
+  Sparkles, Monitor, ShieldCheck, ChevronLeft, ChevronRight, Star,UserPlus, ListChecks, ClipboardList, Code, UploadCloud, Search, BadgeCheck,
+  CheckCircle2, GitBranch, Link2, Eye, FileText,Send, LayoutGrid, BookOpen, FolderOpen, BarChart3, Rocket, FileBadge,
 } from "lucide-react";
 import Button from "../components/ui/Button";
 import Badge from "../components/ui/Badge";
@@ -19,9 +18,6 @@ import { faqs as staticFaqs } from "../data/faqs";
 import { fetchContent } from "../services/contentService";
 import { fetchPrograms } from "../services/programService";
 import { fetchFaqs } from "../services/faqService";
-
-// NOTE: tailwind.config.js mein `xs: "480px"` hona zaroori hai:
-// theme: { extend: { screens: { xs: "480px" } } }
 
 // Fallback copy — used if the CMS content hasn't been set yet or the request
 // fails, so the homepage never shows blank sections.
@@ -41,26 +37,6 @@ const DEFAULT_TECH_TOOLS = { items: ["HTML", "CSS", "JavaScript", "GitHub", "VS 
 const DEFAULT_FINAL_CTA = {
   heading: "Start Your Learning Journey Today",
   description: "Join CodeVantage and turn your learning into real-world projects.",
-};
-
-// Tech icons — component ke bahar, taaki har render par naya object na bane
-const DEVICON = "https://cdn.jsdelivr.net/gh/devicons/devicon/icons";
-const TECH_ICONS = {
-  HTML: `${DEVICON}/html5/html5-original.svg`,
-  HTML5: `${DEVICON}/html5/html5-original.svg`,
-  CSS: `${DEVICON}/css3/css3-original.svg`,
-  CSS3: `${DEVICON}/css3/css3-original.svg`,
-  JavaScript: `${DEVICON}/javascript/javascript-original.svg`,
-  JS: `${DEVICON}/javascript/javascript-original.svg`,
-  React: `${DEVICON}/react/react-original.svg`,
-  "Node.js": `${DEVICON}/nodejs/nodejs-original.svg`,
-  Node: `${DEVICON}/nodejs/nodejs-original.svg`,
-  MongoDB: `${DEVICON}/mongodb/mongodb-original.svg`,
-  Python: `${DEVICON}/python/python-original.svg`,
-  GitHub: `${DEVICON}/github/github-original.svg`,
-  "VS Code": `${DEVICON}/vscode/vscode-original.svg`,
-  PHP: `${DEVICON}/php/php-original.svg`,
-  MySQL: `${DEVICON}/mysql/mysql-original.svg`,
 };
 
 const heroStats = [
@@ -92,11 +68,9 @@ const features = [
   { icon: ShieldCheck, title: "Affordable Certification", description: "Just ₹149 after completion." },
 ];
 
-// Initials ab name se auto-generate hote hain
-const getInitials = (name) =>
-  name.trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
-
-// Placeholder testimonials — swap these for real student quotes once collected.
+// Placeholder testimonials — swap these for real student quotes (and, if
+// available, real photos in place of the initials avatar) once you have
+// them collected.
 const testimonials = [
   {
     name: "Priya Sharma",
@@ -104,35 +78,24 @@ const testimonials = [
     quote:
       "CodeVantage helped me build real projects and boosted my confidence. The certificate process was smooth and transparent.",
     rating: 5,
+    initials: "PS",
   },
   {
-    name: "Sandeep Verma",
+    name: "sandeep Verma",
     role: "Python Intern",
     quote:
       "The task reviews actually taught me something every time. I finished the internship with three projects I'm proud to show.",
     rating: 5,
+    initials: "RV",
   },
   {
-    name: "Mayank Agrawal",
+    name: "Mayank agrawal",
     role: "JavaScript Intern",
     quote:
       "Flexible enough to fit around my college schedule, but structured enough that I always knew what to build next.",
     rating: 4,
+    initials: "AK",
   },
-];
-
-const finalCtaFeatures = [
-  { icon: BookOpen, tone: "bg-blue-100 text-brand", title: "Learn Practical Skills", sub: "Industry-relevant content and hands-on learning." },
-  { icon: FolderOpen, tone: "bg-emerald-100 text-emerald-600", title: "Work on Real Projects", sub: "Build a strong portfolio with guided projects." },
-  { icon: Award, tone: "bg-purple-100 text-purple-600", title: "Get Certified", sub: "Earn verifiable certificates to showcase your skills." },
-  { icon: BarChart3, tone: "bg-orange-100 text-orange-500", title: "Boost Your Career", sub: "Gain experience and stand out in the job market." },
-];
-
-const finalCtaCards = [
-  { icon: BarChart3, color: "text-brand", label: ["Learn", "New Skills"], pos: "left-0 top-[4%]" },
-  { icon: Code2, color: "text-brand", label: ["Work on", "Real Projects"], pos: "left-0 top-[34%]" },
-  { icon: FileBadge, color: "text-amber-500", label: ["Get", "Certified"], pos: "right-0 top-[14%]" },
-  { icon: Rocket, color: "text-brand", label: ["Boost", "Your Career"], pos: "right-0 top-[44%]" },
 ];
 
 /* ---------------------------------------------------------------------
@@ -296,6 +259,20 @@ function StepArt({ index, Icon }) {
   }
 }
 
+/** Floating label chip for the How It Works top-right decoration. */
+function Chip({ icon: Icon, iconClass, children, className = "" }) {
+  return (
+    <div
+      className={`absolute flex items-center gap-2 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-navy shadow-md ring-1 ring-slate-100 ${className}`}
+    >
+      <span className={`inline-flex h-5 w-5 items-center justify-center rounded ${iconClass}`}>
+        <Icon className="h-3 w-3" aria-hidden="true" />
+      </span>
+      {children}
+    </div>
+  );
+}
+
 function Home() {
   const [hero, setHero] = useState(DEFAULT_HERO);
   const [techTools, setTechTools] = useState(DEFAULT_TECH_TOOLS);
@@ -312,7 +289,8 @@ function Home() {
         if (content["home.finalCta"]) setFinalCta(content["home.finalCta"]);
       })
       .catch(() => {
-        // Silently keep defaults.
+        // Silently keep defaults — a homepage that fails to fetch CMS copy
+        // should never look broken to a visitor.
       });
 
     fetchPrograms()
@@ -332,7 +310,9 @@ function Home() {
       });
   }, []);
 
-  // Highlight the last word of the third heading line.
+  // Highlight the last word of the third heading line in amber (e.g. "Get
+  // Certified." -> "Get" in white, "Certified." in amber) — matches the
+  // approved design reference while staying CMS-content-driven.
   const line3Words = hero.headingLine3.trim().split(" ");
   const line3Last = line3Words.pop() || "";
   const line3Rest = line3Words.join(" ");
@@ -346,57 +326,72 @@ function Home() {
   return (
     <div className="overflow-x-hidden">
       <Seo path="/" />
-
-      {/* ============================ Hero ============================ */}
+      {/* Hero */}
       <section className="relative overflow-hidden bg-[#FFFDF3]">
-        {/* Decorative background shapes */}
-        <div className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 sm:h-96 sm:w-96 rounded-full bg-blue-100/70 blur-3xl" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-32 -left-32 h-64 w-64 sm:h-96 sm:w-96 rounded-full bg-amber-100/60 blur-3xl" aria-hidden="true" />
-        <div className="pointer-events-none absolute top-1/3 right-[35%] h-40 w-40 sm:h-72 sm:w-72 rounded-full bg-blue-50/80 blur-3xl" aria-hidden="true" />
-
+        {/* Decorative Background Shapes */}
+        <div
+          className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 sm:h-96 sm:w-96 rounded-full bg-blue-100/70 blur-3xl"
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute -bottom-32 -left-32 h-64 w-64 sm:h-96 sm:w-96 rounded-full bg-amber-100/60 blur-3xl"
+          aria-hidden="true"
+        />
+        <div
+          className="pointer-events-none absolute top-1/3 right-[35%] h-40 w-40 sm:h-72 sm:w-72 rounded-full bg-blue-50/80 blur-3xl"
+          aria-hidden="true"
+        />
+        {/* Main Container */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
           <div className="lg:min-h-[650px] py-10 sm:py-14 lg:py-20 grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-8 xl:gap-12 items-center">
-            {/* LEFT CONTENT */}
+            {/* ============================================================
+          LEFT CONTENT
+      ============================================================ */}
             <div className="relative z-20 text-center lg:text-left">
+              {/* Badge */}
               <FadeIn direction="up" delay={0}>
-                <Badge className="mb-4 sm:mb-6 inline-flex max-w-full text-center bg-blue-50 text-blue-700 border border-blue-100 shadow-sm text-[11px] sm:text-xs">
+                <Badge
+                  className="mb-4 sm:mb-6 inline-flex max-w-full bg-blue-50 text-blue-700 border border-blue-100 shadow-sm text-[11px] sm:text-xs"
+                >
                   {hero.badge}
                 </Badge>
               </FadeIn>
-
+              {/* Heading */}
               <FadeIn direction="up" delay={0.1}>
-                <h1 className="text-[1.9rem] xs:text-3xl sm:text-4xl md:text-5xl lg:text-[2.6rem] xl:text-5xl font-bold text-navy leading-[1.1] tracking-tight break-words">
+                <h1
+                  className="text-[1.9rem] leading-[1.1] xs:text-3xl sm:text-4xl md:text-5xl lg:text-4xl xl:text-5xl font-bold text-navy sm:leading-[1.08] tracking-tight break-words">
                   <span>{hero.headingLine1}</span>
                   <br />
-                  <span>{hero.headingLine2}</span>
+                  <span>
+                    {hero.headingLine2}
+                  </span>
                   <br />
                   <span className="relative inline-block text-blue-600">
                     {line3Rest ? `${line3Rest} ` : ""}
                     {line3Last}
                     {/* Yellow underline */}
-                    <span
-                      className="absolute left-0 right-0 -bottom-1 sm:-bottom-2 h-1 sm:h-1.5 rounded-full bg-amber-400"
-                      aria-hidden="true"
-                    />
+                    <span className="absolute left-0 right-0 -bottom-1 sm:-bottom-2 h-1 sm:h-1.5 rounded-full bg-amber-400"
+                      aria-hidden="true"/>
                   </span>
                 </h1>
               </FadeIn>
-
+              {/* Description */}
               <FadeIn direction="up" delay={0.2}>
                 <p className="mt-5 sm:mt-6 mx-auto lg:mx-0 max-w-xl text-sm sm:text-base md:text-lg leading-relaxed text-slate-700">
-                  {hero.description}
-                </p>
+                  {hero.description}</p>
               </FadeIn>
-
+              {/* CTA Buttons */}
               <FadeIn direction="up" delay={0.3}>
-                <div className="mt-6 sm:mt-8 flex flex-col xs:flex-row xs:justify-center lg:justify-start gap-3 sm:gap-4 max-w-md xs:max-w-none mx-auto lg:mx-0">
+                <div
+                  className="mt-6 sm:mt-8 flex flex-col xs:flex-row xs:justify-center lg:justify-start gap-3 sm:gap-4 max-w-md xs:max-w-none mx-auto lg:mx-0">
+                  {/* Primary */}
                   <Button
                     to="/register"
-                    size="lg"
-                    className="w-full xs:w-auto justify-center bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20"
+                    size="lg" className="w-full xs:w-auto justify-center bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20"
                   >
-                    {hero.ctaPrimaryText} <ArrowRight className="h-4 w-4" />
+                    {hero.ctaPrimaryText}  <ArrowRight className="h-4 w-4" />
                   </Button>
+                  {/* Secondary */}
                   <Button
                     to="/how-it-works"
                     variant="outline"
@@ -408,8 +403,9 @@ function Home() {
                   </Button>
                 </div>
               </FadeIn>
-
-              {/* Highlights */}
+              {/* =========================================================
+            HIGHLIGHTS
+        ========================================================= */}
               <motion.div
                 className="mt-8 sm:mt-12 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-5 sm:gap-6 max-w-md sm:max-w-2xl mx-auto lg:mx-0 text-left"
                 variants={staggerContainer}
@@ -417,16 +413,18 @@ function Home() {
                 animate="show"
               >
                 {heroHighlights.map((h) => (
-                  <motion.div key={h.label} variants={staggerItem} className="flex items-center gap-2 sm:gap-2.5">
-                    <span className="flex h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                      <h.icon className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true" />
-                    </span>
-                    <p className="text-xs sm:text-sm text-slate-700 font-medium leading-snug">{h.label}</p>
+                  <motion.div key={h.label} variants={staggerItem} className="flex items-start gap-2 sm:gap-2.5">
+                    <span
+                      className="flex h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                      <h.icon className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true"/></span>
+                    <p className="text-xs sm:text-sm text-slate-700 font-medium leading-snug">
+                      {h.label}</p>
                   </motion.div>
                 ))}
               </motion.div>
-
-              {/* Mobile / tablet stats */}
+              {/* =========================================================
+            MOBILE / TABLET STATS
+        ========================================================= */}
               <motion.div
                 className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3 lg:hidden text-left"
                 variants={staggerContainer}
@@ -437,57 +435,88 @@ function Home() {
                   <motion.div
                     key={stat.label}
                     variants={staggerItem}
-                    className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl p-3 sm:p-4 shadow-sm"
-                  >
-                    <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white">
-                      <stat.icon className="h-5 w-5" aria-hidden="true" />
+                    className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl p-3 sm:p-4 shadow-sm">
+                    <span
+                      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white"
+                    >
+                      <stat.icon
+                        className="h-5 w-5"
+                        aria-hidden="true"
+                      />
                     </span>
                     <div className="min-w-0">
-                      <p className="text-navy font-bold leading-none">{stat.value}</p>
-                      <p className="text-slate-500 text-xs mt-1 leading-snug">{stat.label}</p>
+                      <p className="text-navy font-bold leading-none">
+                        {stat.value}
+                      </p>
+                      <p className="text-slate-500 text-xs mt-1 leading-snug">
+                        {stat.label}
+                      </p>
                     </div>
                   </motion.div>
                 ))}
               </motion.div>
             </div>
-
-            {/* RIGHT VISUAL */}
-            <FadeIn direction="left" delay={0.2} className="relative">
-              <div className="relative mx-auto w-full max-w-sm xs:max-w-md sm:max-w-xl lg:max-w-none h-[360px] xs:h-[400px] sm:h-[480px] lg:h-[560px]">
-                {/* Background blobs */}
-                <div className="absolute top-[8%] right-[4%] w-[45%] aspect-square rounded-full bg-blue-100 blur-2xl" aria-hidden="true" />
-                <div className="absolute top-[18%] right-[10%] w-[34%] aspect-square rounded-full bg-amber-300/70 blur-xl" aria-hidden="true" />
-                <div className="absolute bottom-2 right-2 sm:right-8 h-28 w-28 sm:h-40 sm:w-40 rounded-full bg-blue-500/10 blur-2xl" aria-hidden="true" />
-
-                {/* Code editor — mobile par hidden */}
-                <div className="hidden sm:block absolute left-0 top-10 lg:top-16 w-[52%] lg:w-[48%] z-10 rounded-2xl overflow-hidden bg-slate-900 border border-slate-700 shadow-2xl">
-                  <div className="flex items-center gap-1.5 px-4 py-3 bg-slate-800 border-b border-white/5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-                    <span className="ml-3 text-[11px] text-slate-400 truncate">project-task-03.jsx</span>
+            {/* ============================================================
+          RIGHT VISUAL
+      ============================================================ */}
+            <FadeIn
+              direction="left"
+              delay={0.2}
+              className="relative"
+            >
+              <div
+                className="relative mx-auto w-full max-w-md sm:max-w-xl lg:max-w-none min-h-[340px] xs:min-h-[380px] sm:min-h-[460px] lg:min-h-[560px]"
+              >
+                {/* ========================================================
+              BLUE / YELLOW BACKGROUND SHAPES
+          ======================================================== */}
+                <div
+                  className="absolute top-8 right-2 sm:top-10 sm:right-10 w-44 h-44 sm:w-72 sm:h-72 rounded-full bg-blue-100 blur-2xl"
+                  aria-hidden="true"
+                />
+                <div
+                  className="absolute top-20 right-8 sm:top-28 sm:right-20 w-32 h-32 sm:w-56 sm:h-56 rounded-full bg-amber-300/70 blur-xl"
+                  aria-hidden="true"
+                />
+                {/* ========================================================
+              CODE EDITOR
+          ======================================================== */}
+                <div
+                  className="absolute top-8 sm:top-16 left-0 sm:left-4 lg:left-0 w-[62%] sm:w-[68%] z-10 rounded-xl sm:rounded-2xl overflow-hidden bg-slate-900 border border-slate-700 shadow-2xl"
+                >
+                  {/* Browser Bar */}
+                  <div
+                    className="flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-3 bg-slate-800 border-b border-white/5"
+                  >
+                    <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-red-400" />
+                    <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-amber-400" />
+                    <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-green-400" />
+                    <span className="ml-2 sm:ml-3 text-[9px] sm:text-[11px] text-slate-400 truncate">
+                      project-task-03.jsx
+                    </span>
                   </div>
-                  <div className="p-4 lg:p-5 space-y-2.5">
-                    {["w-2/5", "w-3/5", "w-1/2", "w-4/5", "w-2/5"].map((w, i) => (
-                      <div key={i} className={`h-2.5 rounded bg-cyan-400/40 ${w}`} />
-                    ))}
+                  {/* Code Lines */}
+                  <div className="p-3 sm:p-6 space-y-2 sm:space-y-3 font-mono">
+                    <div className="h-2.5 sm:h-3 rounded bg-cyan/40 w-2/5" />
                   </div>
                 </div>
-
-                {/* Student image */}
-                <div className="absolute inset-x-0 bottom-0 top-6 sm:top-0 z-20 flex items-end justify-center lg:justify-end">
+                {/* ========================================================
+              STUDENT / LAPTOP IMAGE
+          ======================================================== */}
+                <div
+                  className="absolute bottom-6 sm:bottom-14 right-0 sm:right-6 lg:right-16 w-[88%] sm:w-[90%] lg:w-[90%] z-20" >
                   <img
-                    src={HERO_IMAGE}
+                    src="/images/hero-student.png"
                     alt="Student working on real-world projects"
-                    fetchpriority="high"
                     decoding="async"
-                    className="max-h-full w-auto max-w-[92%] sm:max-w-[85%] object-contain object-bottom drop-shadow-2xl"
+                    className="block w-full h-auto max-h-[340px] sm:max-h-none object-contain object-bottom drop-shadow-2xl"
                   />
                 </div>
-
-                {/* Floating stats — sirf lg+ */}
+                {/* ========================================================
+              FLOATING STATS (laptop/desktop only — tablet & mobile use the stat cards on the left)
+          ======================================================== */}
                 <motion.div
-                  className="absolute top-0 right-0 xl:-right-6 z-30 hidden lg:flex flex-col gap-3 w-48 xl:w-52"
+                  className="absolute top-0 right-0 lg:-right-6 z-30 hidden lg:flex flex-col gap-3 w-52"
                   variants={staggerContainer}
                   initial="hidden"
                   animate="show"
@@ -498,128 +527,209 @@ function Home() {
                       variants={staggerItem}
                       className="flex items-center gap-3 bg-white rounded-xl p-3.5 border border-slate-100 shadow-lg"
                     >
-                      <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white">
-                        <stat.icon className="h-5 w-5" aria-hidden="true" />
+                      <span
+                        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white"
+                      >
+                        <stat.icon
+                          className="h-5 w-5"
+                          aria-hidden="true"
+                        />
                       </span>
                       <div className="min-w-0">
-                        <p className="text-navy font-bold leading-none text-base">{stat.value}</p>
-                        <p className="text-slate-600 text-xs mt-1 leading-snug">{stat.label}</p>
+                        <p className="text-navy font-bold leading-none text-base">
+                          {stat.value}
+                        </p>
+                        <p className="text-slate-600 text-xs mt-1 leading-snug">
+                          {stat.label}
+                        </p>
                       </div>
                     </motion.div>
                   ))}
                 </motion.div>
-
-                {/* Floating project card */}
-                <FadeIn direction="up" delay={0.6} className="absolute bottom-2 sm:bottom-6 left-0 sm:left-2 xl:-left-6 z-40">
-                  <div className="flex items-center gap-2.5 sm:gap-3 bg-white rounded-xl p-2.5 sm:p-4 shadow-xl border border-slate-100 w-44 sm:w-56">
-                    <span className="flex h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                      <Handshake className="h-5 w-5" aria-hidden="true" />
+                {/* ========================================================
+              FLOATING PROJECT CARD
+          ======================================================== */}
+                <FadeIn
+                  direction="up"
+                  delay={0.6}
+                  className="absolute bottom-2 sm:bottom-8 left-0 sm:left-2 lg:-left-6 z-40"
+                >
+                  <div
+                    className="flex items-center gap-2.5 sm:gap-3 bg-white rounded-xl p-2.5 sm:p-4 shadow-xl border border-slate-100 w-44 sm:w-56"
+                  >
+                    <span
+                      className="flex h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600"
+                    >
+                      <Handshake
+                        className="h-5 w-5"
+                        aria-hidden="true"
+                      />
                     </span>
                     <p className="text-navy text-xs sm:text-sm font-semibold leading-snug">
                       Turn Your Ideas Into Real Projects
                     </p>
                   </div>
                 </FadeIn>
+                {/* ========================================================
+              DECORATIVE BLUE CIRCLE
+          ======================================================== */}
+                <div
+                  className="absolute bottom-2 right-2 sm:right-8 h-28 w-28 sm:h-40 sm:w-40 rounded-full bg-blue-500/10 blur-2xl z-0"
+                  aria-hidden="true"
+                />
               </div>
             </FadeIn>
           </div>
         </div>
       </section>
+      
+      {/* Technologies & Tools */}
 
-      {/* ====================== Technologies & Tools ====================== */}
       <section className="pt-14 pb-8 sm:pt-16 sm:pb-10 bg-white border-b border-slate-100">
         <Reveal className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
           <div className="rounded-2xl border border-slate-200 bg-white shadow-[0_8px_30px_rgba(15,23,42,0.06)] px-4 sm:px-7 lg:px-8 py-5 sm:py-7">
+
+            {/* Heading - Top */}
             <div className="text-center mb-5 sm:mb-7">
-              <p className="text-base sm:text-xl font-bold text-navy">Technologies I'll Work With</p>
+              <p className="text-base sm:text-xl font-bold text-navy">
+                Technologies I ’ll Work With
+              </p>
             </div>
 
+            {/* Divider */}
             <div className="w-full h-px bg-slate-200 mb-5 sm:mb-7" />
 
+            {/* Technologies */}
             <div className="grid grid-cols-3 sm:grid-cols-4 md:flex md:flex-wrap md:items-center md:justify-center gap-x-3 sm:gap-x-6 lg:gap-x-12 gap-y-5 sm:gap-y-6">
-              {techTools.items.map((tool) => (
-                <div key={tool} className="flex flex-col items-center justify-center gap-2 md:min-w-[70px]">
-                  <div className="h-12 w-12 sm:h-14 sm:w-14 lg:h-16 lg:w-16 flex items-center justify-center">
-                    {TECH_ICONS[tool] ? (
-                      <img
-                        src={TECH_ICONS[tool]}
-                        alt={`${tool} logo`}
-                        loading="lazy"
-                        width="56"
-                        height="56"
-                        className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 object-contain"
-                      />
-                    ) : (
-                      <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center text-xs font-bold text-navy">
-                        {tool.slice(0, 2).toUpperCase()}
-                      </div>
-                    )}
+
+              {techTools.items.map((tool) => {
+                const iconMap = {
+                  HTML: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+                  HTML5: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+
+                  CSS: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
+                  CSS3: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
+
+                  JavaScript:
+                    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+
+                  JS:
+                    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+
+                  React:
+                    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+
+                  "Node.js":
+                    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+
+                  Node:
+                    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+
+                  MongoDB:
+                    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
+
+                  Python:
+                    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+
+                  GitHub:
+                    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg",
+
+                  "VS Code":
+                    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg",
+
+                  PHP:
+                    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",
+
+                  MySQL:
+                    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
+                };
+
+                return (
+                  <div
+                    key={tool}
+                    className="flex flex-col items-center justify-center gap-2 md:min-w-[70px]"
+                  >
+                    <div className="h-12 w-12 sm:h-14 sm:w-14 lg:h-16 lg:w-16 flex items-center justify-center">
+                      {iconMap[tool] ? (
+                        <img
+                          src={iconMap[tool]}
+                          alt={`${tool} logo`}
+                          loading="lazy"
+                          className="h-10 w-10 sm:h-12 sm:w-12 lg:h-14 lg:w-14 object-contain"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-lg bg-slate-100 flex items-center justify-center text-xs font-bold text-navy">
+                          {tool.slice(0, 2).toUpperCase()}
+                        </div>
+                      )}
+                    </div>
+
+                    <span className="text-xs sm:text-sm font-medium text-navy text-center whitespace-nowrap">
+                      {tool}
+                    </span>
                   </div>
-                  <span className="text-xs sm:text-sm font-medium text-navy text-center whitespace-nowrap">{tool}</span>
-                </div>
-              ))}
+                );
+              })}
+
             </div>
           </div>
         </Reveal>
       </section>
 
-      {/* ============================ Programs ============================ */}
+      {/* Programs */}
       <section className="py-12 sm:py-20 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
-          <Reveal className="mb-8 sm:mb-10 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+          <Reveal className="flex items-end justify-between flex-wrap gap-4">
             <SectionHeading
               eyebrow="Popular Programs"
               title="Our Internship Programs"
               description="Choose a program, work on real projects, and get certified."
               highlightLast={1}
             />
-            <Button to="/internships" variant="outline" className="w-full sm:w-auto justify-center flex-shrink-0">
+            <Button to="/internships" variant="outline" className="w-full xs:w-auto justify-center">
               View All Programs <ArrowRight className="h-4 w-4" />
             </Button>
           </Reveal>
-
           <motion.div
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch"
             variants={staggerContainer}
             initial="hidden"
             whileInView="show"
-            viewport={{ once: true, amount: 0.1 }}
+            viewport={{ once: true, amount: 0.15 }}
           >
             {programs.map((program) => (
-              <motion.div key={program.slug} variants={staggerItem} className="h-full min-w-0">
+              <motion.div key={program.slug} variants={staggerItem} className="h-full">
                 <ProgramCard program={program} />
               </motion.div>
             ))}
-
-            {/* Quiz banner: poori row le leta hai */}
-            <motion.div variants={staggerItem} className="sm:col-span-2 lg:col-span-4 min-w-0">
-              <div className="relative overflow-hidden rounded-card bg-navy p-5 sm:p-6 lg:px-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-                <Sparkles className="absolute top-4 right-4 h-6 w-6 text-amber-300/70" aria-hidden="true" />
-                <div className="min-w-0 lg:max-w-xl pr-8">
-                  <h3 className="text-base sm:text-lg lg:text-xl font-bold text-white leading-snug">
+            {/* Not sure which program? — quiz teaser card */}
+            <motion.div variants={staggerItem} className="h-full">
+              <div className="h-full rounded-card bg-navy p-5 sm:p-6 flex flex-col justify-between relative overflow-hidden">
+                <Sparkles className="absolute top-5 right-4 sm:top-6 sm:right-5 h-6 w-6 text-amber-300/70" aria-hidden="true" />
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-white leading-snug pr-8">
                     Not Sure Which Program is Right for You?
                   </h3>
-                  <p className="text-sm text-slate-300 mt-2 leading-relaxed">
+                  <p className="text-sm text-slate-300 mt-3 leading-relaxed">
                     Take a short quiz and get a personalized program recommendation.
                   </p>
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {["HTML", "JS", "PHP", "Python"].map((tag) => (
-                      <span key={tag} className="text-[10px] font-semibold bg-white/10 text-slate-200 px-2 py-1 rounded-md">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
                 </div>
-                <Button to="/contact" size="md" className="w-full lg:w-auto justify-center flex-shrink-0">
+                <Button to="/contact" size="md" className="mt-6 w-full">
                   Find My Path <ArrowRight className="h-4 w-4" />
                 </Button>
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {["HTML", "JS", "PHP", "Python"].map((tag) => (
+                    <span key={tag} className="text-[10px] font-semibold bg-white/10 text-slate-200 px-2 py-1 rounded-md">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               </div>
             </motion.div>
           </motion.div>
         </div>
       </section>
-
-      {/* ======================= How It Works preview ======================= */}
+      {/* How It Works preview */}
       <section className="relative overflow-hidden bg-gradient-to-b from-blue-50/70 via-white to-white py-12 sm:py-20">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
           <Reveal>
@@ -638,7 +748,7 @@ function Home() {
           </Reveal>
 
           <motion.div
-            className="grid grid-cols-1 gap-x-10 gap-y-5 sm:gap-y-6 sm:grid-cols-2 lg:grid-cols-3"
+            className="grid grid-cols-1 gap-x-8 gap-y-5 sm:gap-y-6 sm:grid-cols-2 lg:grid-cols-4"
             variants={staggerContainer}
             initial="hidden"
             whileInView="show"
@@ -656,11 +766,9 @@ function Home() {
                   <p className="mt-3 text-base sm:text-lg font-bold text-navy">{step.title}</p>
                   <p className="mt-1 text-sm leading-relaxed text-muted">{step.description}</p>
                 </div>
-
-                {/* Arrow: sirf lg par, har row ke last card ke baad nahi */}
-                {i % 3 !== 2 && i !== howItWorksSteps.length - 1 && (
+                {i % 4 !== 3 && i !== howItWorksSteps.length - 1 && (
                   <span
-                    className="absolute -right-9 top-[30%] z-10 hidden h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-brand ring-4 ring-white lg:inline-flex"
+                    className="absolute -right-[1.4rem] top-[30%] z-10 hidden h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-brand ring-4 ring-white lg:inline-flex"
                     aria-hidden="true"
                   >
                     <ChevronRight className="h-4 w-4" />
@@ -678,10 +786,10 @@ function Home() {
         </div>
       </section>
 
-      {/* ============ Why Choose CodeVantage + Student Testimonials ============ */}
+      {/* Why Choose CodeVantage + Student Testimonials */}
       <section className="py-12 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
-          <Reveal className="rounded-2xl border border-amber-200 bg-[#FFF9E8] p-4 sm:p-6 lg:p-10 grid lg:grid-cols-2 gap-8 lg:gap-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 ">
+          <Reveal className="rounded-2xl border border-amber-200 bg-amber-50/60 p-4 sm:p-6 lg:p-10 grid lg:grid-cols-2 gap-8 lg:gap-10  bg-[#FFF9E8]">
             {/* Left: Why Choose */}
             <div className="min-w-0">
               <Badge tone="sky" className="mb-4">
@@ -715,7 +823,7 @@ function Home() {
 
             {/* Right: Testimonials */}
             <div className="min-w-0 border-t lg:border-t-0 lg:border-l border-amber-200 pt-8 lg:pt-0 lg:pl-10">
-              <div className="flex flex-wrap items-start justify-between gap-3 sm:gap-4">
+              <div className="flex items-start justify-between gap-3 sm:gap-4">
                 <div className="min-w-0">
                   <Badge tone="sky" className="mb-4">
                     Their Stories
@@ -750,13 +858,13 @@ function Home() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                className="mt-6 sm:mt-8 bg-white rounded-xl border border-slate-100 shadow-card p-4 sm:p-5 flex flex-col xs:flex-row gap-3 sm:gap-4 lg:min-h-[220px]"
+                className="mt-6 sm:mt-8 bg-white rounded-xl border border-slate-100 shadow-card p-4 sm:p-5 flex gap-3 sm:gap-4"
               >
                 <span
                   className="flex h-11 w-11 sm:h-14 sm:w-14 flex-shrink-0 items-center justify-center rounded-full bg-brand text-white text-sm sm:text-base font-semibold"
                   aria-hidden="true"
                 >
-                  {getInitials(activeTestimonial.name)}
+                  {activeTestimonial.initials}
                 </span>
                 <div className="min-w-0">
                   <p className="text-sm sm:text-base text-navy/90 leading-relaxed">&ldquo;{activeTestimonial.quote}&rdquo;</p>
@@ -766,7 +874,8 @@ function Home() {
                     {Array.from({ length: 5 }).map((_, i) => (
                       <Star
                         key={i}
-                        className={`h-4 w-4 ${i < activeTestimonial.rating ? "text-amber-400 fill-amber-400" : "text-slate-300"}`}
+                        className={`h-4 w-4 ${i < activeTestimonial.rating ? "text-amber-400 fill-amber-400" : "text-slate-300"
+                          }`}
                       />
                     ))}
                   </div>
@@ -777,9 +886,9 @@ function Home() {
         </div>
       </section>
 
-      {/* ======================== About + FAQ preview ======================== */}
+      {/* About + FAQ preview */}
       <section className="py-12 sm:py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 grid lg:grid-cols-2 gap-10 lg:gap-16">
           <Reveal direction="left" className="min-w-0">
             <Badge className="mb-4">Our Story</Badge>
             <h2 className="text-2xl sm:text-3xl font-bold text-navy mb-4">
@@ -795,7 +904,7 @@ function Home() {
             </Button>
           </Reveal>
           <Reveal direction="right" delay={0.1} className="min-w-0">
-            <div className="flex flex-wrap items-center justify-between mb-6 gap-3">
+            <div className="flex items-center justify-between mb-6 gap-3">
               <Badge>FAQs</Badge>
               <Button to="/faq" variant="ghost" className="!px-0">
                 View All FAQs <ArrowRight className="h-4 w-4" />
@@ -806,37 +915,37 @@ function Home() {
         </div>
       </section>
 
-      {/* ============================ Final CTA ============================ */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#FFFDF7] via-[#FFF9E8] to-[#FFF3D1] py-12 sm:py-16 lg:py-20">
-        <div className="pointer-events-none absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-blue-100/60 blur-3xl" aria-hidden="true" />
-        <div className="pointer-events-none absolute right-[8%] top-10 h-80 w-80 rounded-full bg-amber-100/70 blur-3xl" aria-hidden="true" />
+      {/* Final CTA */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#FFFDF7] via-[#FFF9E8] to-[#FFF3D1] py-2 sm:py-4 lg:py-6">
+        {/* soft background blobs */}
+        <div className="pointer-events-none absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-blue-100/60 blur-3xl" />
+        <div className="pointer-events-none absolute right-[8%] top-10 h-80 w-80 rounded-full bg-amber-100/70 blur-3xl" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="grid gap-10 lg:gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] items-center">
-            {/* Left */}
+          <div className="grid gap-10 lg:gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] items-center">
+            {/* ── Left: copy, buttons, features ── */}
             <div className="min-w-0 text-center lg:text-left">
               <Reveal>
-                <span className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-full bg-amber-100/80 px-3 sm:px-4 py-2 text-[11px] sm:text-sm font-medium text-amber-600">
+                <span className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-full bg-amber-100/80 px-4 py-2 text-xs sm:text-sm font-medium text-amber-600">
                   <GraduationCap className="h-4 w-4" />
                   Practical Learning <span>•</span> Real Projects <span>•</span> Career Ready
                 </span>
-
-                <h2 className="mt-5 text-3xl sm:text-4xl xl:text-5xl font-extrabold leading-[1.1] text-navy tracking-tight break-words">
+                <h2 className="mt-5 text-3xl sm:text-5xl xl:text-[46px] font-extrabold leading-[1.1] text-navy tracking-tight">
                   {String(finalCta.heading)
                     .split(/(Learning)/)
                     .map((part, i) =>
                       part === "Learning" ? (
-                        <span key={i} className="text-brand">{part}</span>
+                        <span key={i} className="text-brand">
+                          {part}
+                        </span>
                       ) : (
                         <span key={i}>{part}</span>
                       ),
                     )}
                 </h2>
-
-                <p className="mt-4 sm:mt-5 max-w-xl mx-auto lg:mx-0 text-sm sm:text-base lg:text-lg text-slate-600 leading-relaxed">
+        <p className="mt-4 sm:mt-5 max-w-xl mx-auto lg:mx-0 text-base sm:text-lg text-slate-600 leading-relaxed">
                   {finalCta.description}
                 </p>
-
                 <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start gap-3 sm:gap-4 max-w-md sm:max-w-none mx-auto lg:mx-0">
                   <Button to="/register" size="lg" className="w-full sm:w-auto justify-center">
                     <Send className="h-4 w-4" /> Apply for Internship <ArrowRight className="h-3 w-3" />
@@ -845,8 +954,7 @@ function Home() {
                     to="/internships"
                     variant="outline"
                     size="lg"
-                    className="w-full sm:w-auto justify-center bg-white border-brand text-brand hover:bg-blue-50"
-                  >
+                    className="w-full sm:w-auto justify-center bg-white border-brand text-brand hover:bg-blue-50">
                     <LayoutGrid className="h-4 w-4" /> Explore Programs
                   </Button>
                 </div>
@@ -854,17 +962,23 @@ function Home() {
 
               {/* Feature columns */}
               <motion.div
-                className="mt-8 sm:mt-10 grid grid-cols-1 min-[480px]:grid-cols-2 xl:grid-cols-4 gap-x-4 gap-y-6 text-left"
+                className="mt-8 sm:mt-10 grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-4 gap-x-0 gap-y-6 text-left"
                 variants={staggerContainer}
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true, amount: 0.3 }}
               >
-                {finalCtaFeatures.map(({ icon: Icon, tone, title, sub }, i) => (
+                {[
+                  { icon: BookOpen, tone: "bg-blue-100 text-brand", title: "Learn Practical Skills", sub: "Industry-relevant content and hands-on learning." },
+                  { icon: FolderOpen, tone: "bg-emerald-100 text-emerald-600", title: "Work on Real Projects", sub: "Build a strong portfolio with guided projects." },
+                  { icon: Award, tone: "bg-purple-100 text-purple-600", title: "Get Certified", sub: "Earn verifiable certificates to showcase your skills." },
+                  { icon: BarChart3, tone: "bg-orange-100 text-orange-500", title: "Boost Your Career", sub: "Gain experience and stand out in the job market." },
+                ].map(({ icon: Icon, tone, title, sub }, i) => (
                   <motion.div
                     key={title}
                     variants={staggerItem}
-                    className={`flex flex-col gap-2 min-w-0 xl:px-4 xl:first:pl-0 ${i > 0 ? "xl:border-l xl:border-slate-200/80" : ""}`}
+                    className={`flex flex-col gap-2 min-w-0 px-0 min-[480px]:px-4 md:first:pl-0 ${i > 0 ? "md:border-l md:border-slate-200/80" : ""
+                      }`}
                   >
                     <span className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center ${tone}`}>
                       <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -875,24 +989,24 @@ function Home() {
                 ))}
               </motion.div>
             </div>
-
-            {/* Right: image + floating cards */}
-            <div className="relative mx-auto w-full max-w-sm sm:max-w-md lg:max-w-none h-[300px] sm:h-[380px] lg:h-[420px]">
-              <div className="absolute inset-x-[6%] inset-y-[4%] rounded-[45%] bg-amber-100/70" aria-hidden="true" />
-              <img
-                src={HERO_IMAGE}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                className="absolute inset-0 h-full w-full object-contain object-bottom"
-              />
-
-              {finalCtaCards.map(({ icon: Icon, color, label, pos }) => (
+            {/* ── Right: student image + floating cards ── */}
+            <div className="relative mx-auto w-full max-w-md sm:max-w-lg lg:max-w-none aspect-[3/2.2] lg:aspect-[3/2.5]">
+              {/* soft yellow blob behind the photo */}
+              <div className="absolute rounded-[45%] bg-amber-100/70" />
+                <img src={HERO_IMAGE} alt="" className="h-80 w-full object-contain object-left-bottom" />
+          
+              {/* Floating cards (hidden on very small screens) */}
+              {[
+                { icon: BarChart3, color: "text-brand", label: ["Learn", "New Skills"], pos: "left-[2%] top-[4%]" },
+                { icon: Code2, color: "text-brand", label: ["Work on", "Real Projects"], pos: "-left-[2%] sm:left-[-6%] top-[30%]" },
+                { icon: FileBadge, color: "text-amber-500", label: ["Get", "Certified"], pos: "right-[0%] top-[20%]" },
+                { icon: Rocket, color: "text-brand", label: ["Boost", "Your Career"], pos: "right-[-2%] top-[46%]" },
+              ].map(({ icon: Icon, color, label, pos }) => (
                 <div
                   key={label.join(" ")}
-                  className={`hidden min-[480px]:flex absolute ${pos} flex-col gap-1 rounded-2xl bg-white px-3 py-2 sm:px-4 sm:py-3 shadow-lg shadow-slate-200/70`}
+                  className={`hidden min-[480px]:flex absolute ${pos} flex-col gap-1.5 rounded-2xl bg-white px-3 py-2.5 sm:px-4 sm:py-3 shadow-lg shadow-slate-200/70`}
                 >
-                  <Icon className={`h-6 w-6 sm:h-7 sm:w-7 ${color}`} />
+                  <Icon className={`h-6 w-6 sm:h-8 sm:w-8 ${color}`} />
                   <p className="text-xs sm:text-sm font-medium text-navy leading-tight">
                     {label[0]}
                     <br />
@@ -907,5 +1021,5 @@ function Home() {
     </div>
   );
 }
-
 export default Home;
+
