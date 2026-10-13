@@ -17,22 +17,23 @@ const connectDB = require("./config/db");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
+const isProduction = process.env.NODE_ENV === "production";
 
 // Trust the first proxy hop (Render/Railway/Vercel/etc. sit behind a load
 // balancer) so req.ip and secure cookies work correctly in production.
-if (process.env.NODE_ENV === "production") {
+if (isProduction) {
   app.set("trust proxy", 1);
 }
 
-// ---- Database ----
-connectDB();
+app.disable("x-powered-by");
 
 // ---- Security middleware ----
 app.use(helmet());
+
 // CLIENT_URL may hold one or several comma-separated frontend origins. Trailing
-// slashes are stripped because browsers send the Origin header without one —
-// "https://app.onrender.com/" in the env var would otherwise never match.
-const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
+// slashes are stripped because browsers send the Origin header without one.
+// CLIENT_ORIGIN (used by the old chatbot server) is also accepted as a fallback.
+const allowedOrigins = (process.env.CLIENT_URL || process.env.CLIENT_ORIGIN || "http://localhost:5173")
   .split(",")
   .map((o) => o.trim().replace(/\/+$/, ""))
   .filter(Boolean);
@@ -48,11 +49,21 @@ app.use(
   })
 );
 app.use(compression()); // gzip responses
+
+// ---- Body parsers (must come BEFORE the sanitizers so req.body is sanitized too) ----
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
+app.use(cookieParser());
+
 app.use(mongoSanitize()); // strips $ and . from req.body/query to prevent NoSQL injection
 app.use(xss()); // sanitizes user input from malicious HTML/JS
 app.use(hpp()); // prevents HTTP parameter pollution (e.g. ?status=a&status=b tricks)
 
-const isProduction = process.env.NODE_ENV === "production";
+if (!isProduction) {
+  app.use(morgan("dev"));
+}
+
+// ---- Rate limiting ----
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   // Production: 300 requests per IP per window (configurable via RATE_LIMIT_MAX).
@@ -64,23 +75,28 @@ const apiLimiter = rateLimit({
 });
 app.use("/api", apiLimiter);
 
-// ---- Core middleware ----
-app.use(express.json({ limit: "1mb" }));
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-if (process.env.NODE_ENV !== "production") {
-  app.use(morgan("dev"));
-}
+// Stricter limit for the public chatbot: every request costs a Gemini API call.
+const chatLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: Number(process.env.CHAT_RATE_LIMIT_MAX) || 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: "Too many chat requests. Please try again in a minute.",
+    message: "Too many chat requests. Please try again in a minute.",
+  },
+});
 
 // Opening the bare backend URL in a browser (what people do right after a Render
-// deploy) used to show "Route not found: /". Give it a clear answer instead.
+// deploy) gets a clear answer instead of "Route not found".
 app.get("/", (req, res) => {
   res.json({ success: true, message: "CodeVantage API is running. All endpoints live under /api." });
 });
 
 // ---- Health check (also useful as an uptime-monitor / deployment-check target) ----
 app.get("/api/health", (req, res) => {
-  res.json({ success: true, message: "CodeVantage API is running.", env: process.env.NODE_ENV });
+  res.json({ success: true, status: "ok", message: "CodeVantage API is running.", env: process.env.NODE_ENV });
 });
 
 // ---- Route mounts ----
@@ -99,11 +115,24 @@ app.use("/api/analytics", require("./routes/analyticsRoutes"));
 app.use("/api/programs", require("./routes/programRoutes"));
 app.use("/api/faqs", require("./routes/faqRoutes"));
 
+// Public chatbot API (Gemini). No login required.
+app.use("/api/chat", chatLimiter, require("./routes/chatbotRoutes"));
+
 // ---- Error handling (must be last) ----
 app.use(notFound);
 app.use(errorHandler);
 
+// ---- Start: connect to the database first, then listen ----
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`CodeVantage server running on port ${PORT} [${process.env.NODE_ENV || "development"}]`);
-});
+
+(async () => {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`CodeVantage server running on port ${PORT} [${process.env.NODE_ENV || "development"}]`);
+    });
+  } catch (err) {
+    console.error("Failed to start server:", err.message);
+    process.exit(1);
+  }
+})();
