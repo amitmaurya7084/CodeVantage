@@ -109,7 +109,7 @@ function Register() {
           <div className="flex flex-col">
             
             <h1 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-navy sm:text-5xl">
-              Chat With<span className="text-brand">Assistant</span>
+              Chat With <span className="text-brand">Assistant</span>
             </h1> <br/>
            
 <ProjectChatbot/>
