@@ -1,6 +1,10 @@
 import { useRef, useEffect, useState } from "react";
 import "./ProjectChatbot.css";
 
+const API_BASE = import.meta.env.VITE_API_URL || "";
+
+
+
 /* ---------- tiny inline icons (no external icon package needed) ---------- */
 function Icon({ children, size = 20, className = "" }) {
   return (
@@ -173,7 +177,7 @@ export default function ProjectChatbot() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/chat", {
+      const response = await fetch(`${API_BASE}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -195,7 +199,7 @@ export default function ProjectChatbot() {
       }
 
       if (!response.ok) {
-        throw new Error(data.error || `Chat request failed (HTTP ${response.status}).`);
+        throw new Error(data.error || data.message || `Chat request failed (HTTP ${response.status}).`);
       }
 
       if (!data.reply) {
