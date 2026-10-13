@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 import "./ProjectChatbot.css";
 
-const API_BASE = import.meta.env.VITE_API_URL || "";
+const API_BASE = (import.meta.env.VITE_API_URL || "/api").replace(/\/+$/, "");
 
 
 
@@ -177,7 +177,7 @@ export default function ProjectChatbot() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE}/api/chat`, {
+      const response = await fetch(`${API_BASE}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
