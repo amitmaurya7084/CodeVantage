@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import ProjectChatbot from "./ProjectChatbot.jsx";
 import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import {
@@ -106,65 +107,15 @@ function Register() {
         <div className="grid items-start gap-8 lg:grid-cols-[1fr,0.95fr]">
           {/* LEFT: intro, benefits, illustration slot */}
           <div className="flex flex-col">
-            <span className="inline-flex w-fit items-center gap-2 rounded-full bg-blue-100 px-3.5 py-1.5 text-sm font-semibold text-brand">
-              <Rocket className="h-4 w-4" aria-hidden="true" /> Join Our Learners
-            </span>
+            
             <h1 className="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-navy sm:text-5xl">
-              Create Your
-              <br />
-              <span className="text-brand">Account</span>
-            </h1>
-            <p className="mt-4 max-w-md text-lg text-muted">
-              Start your internship journey with CodeVantage and build real-world skills through hands-on
-              projects.
-            </p>
-
-            <ul className="mt-6 space-y-4">
-              {BENEFITS.map((b) => (
-                <li key={b.title} className="flex items-start gap-4">
-                  <span
-                    className={`inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl ${b.box}`}
-                  >
-                    <b.icon className="h-6 w-6" aria-hidden="true" />
-                  </span>
-                  <div>
-                    <p className="font-bold text-navy">{b.title}</p>
-                    <p className="max-w-sm text-sm text-muted">{b.text}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-
-            {/* IMAGE SLOT — illustration (boy with laptop, Learn / Build / Get Certified tags, plant, books) */}
-            <div className="relative mt-6 hidden lg:block">
-              {REGISTER_HERO_IMAGE ? (
-                <img src={REGISTER_HERO_IMAGE} alt="" className="h-80 w-full object-contain object-left-bottom" />
-              ) : (
-                <div className="flex h-72 items-center justify-center rounded-2xl border-2 border-dashed border-blue-300/70 bg-gradient-to-b from-blue-50 to-blue-100/60 text-center text-sm font-medium text-blue-700/80">
-                  <div>
-                    Image yahan lagegi
-                    <br />
-                    <span className="text-xs font-normal">REGISTER_HERO_IMAGE</span>
-                  </div>
-                </div>
-              )}
-              <div
-                className="pointer-events-none absolute right-2 top-2 -rotate-6 text-navy"
-                style={{ fontFamily: "CertSignature", fontSize: "1.9rem", lineHeight: 1.05 }}
-                aria-hidden="true"
-              >
-                Turn
-                <br />
-                <span className="ml-3 inline-block">Ideas into</span>
-                <br />
-                <span className="ml-6 inline-block">Impact!</span>
-                <svg className="ml-2 mt-1 w-32" viewBox="0 0 130 24" fill="none">
-                  <path d="M2 20 C40 14 90 8 126 2" stroke="#2563EB" strokeWidth="3" strokeLinecap="round" />
-                </svg>
-              </div>
-            </div>
+              Create Your<span className="text-brand">Account</span>
+            </h1> <br/>
+           
+<ProjectChatbot/>
+           
           </div>
-
+  
           {/* RIGHT: form */}
           <Card className="p-6 sm:p-8">
             <div className="mb-6 flex items-center gap-4">
@@ -379,6 +330,7 @@ function Register() {
               <span className="h-px flex-1 bg-slate-200" />
             </div>
           </Card>
+
         </div>
       </Container>
     </div>
