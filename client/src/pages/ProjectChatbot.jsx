@@ -1,9 +1,11 @@
 import { useRef, useEffect, useState } from "react";
-import "./ProjectChatbot.css";
 
 const API_BASE = (import.meta.env.VITE_API_URL || "/api").replace(/\/+$/, "");
 
-
+// Render's free plan puts idle servers to sleep; the first request can be slow.
+const REQUEST_TIMEOUT_MS = 60000;
+// How many previous messages are sent along so follow-up questions make sense.
+const HISTORY_LIMIT = 8;
 
 /* ---------- tiny inline icons (no external icon package needed) ---------- */
 function Icon({ children, size = 20, className = "" }) {
@@ -120,19 +122,65 @@ function LogoMark({ size = 30 }) {
   );
 }
 
-// Display-only quick-help cards (clicking one sends its title through the same chat API call).
+// Full class names are written out (not built dynamically) so Tailwind can detect them.
+const TONES = {
+  blue: "bg-blue-50 text-blue-600",
+  red: "bg-red-50 text-red-500",
+  green: "bg-emerald-50 text-emerald-500",
+  purple: "bg-purple-50 text-purple-600",
+  orange: "bg-orange-50 text-orange-500",
+};
+
+// Quick-help cards. `title` is shown to the user; `question` is the full,
+// specific question actually sent to the chatbot.
 const QUICK_HELP = [
-  { title: "Registration Help", sub: "Create your account", icon: IUser, tone: "blue" },
-  { title: "Program Details", sub: "Explore internships", icon: IFile, tone: "red" },
-  { title: "Certificates", sub: "Eligibility & download", icon: IAward, tone: "green" },
-  { title: "Submission Help", sub: "How to submit projects", icon: IList, tone: "purple" },
-  { title: "Payment Support", sub: "Fees & transactions", icon: ICard, tone: "orange" },
-  { title: "Other Questions", sub: "Get instant help", icon: IHelp, tone: "blue" },
+  {
+    title: "Registration Help",
+    sub: "Create your account",
+    icon: IUser,
+    tone: "blue",
+    question: "How do I register and create an account on CodeVantage?",
+  },
+  {
+    title: "Program Details",
+    sub: "Explore internships",
+    icon: IFile,
+    tone: "red",
+    question: "What internship programs does CodeVantage offer and how do they work?",
+  },
+  {
+    title: "Certificates",
+    sub: "Eligibility & download",
+    icon: IAward,
+    tone: "green",
+    question: "How do I become eligible for a certificate, and how do I download it?",
+  },
+  {
+    title: "Submission Help",
+    sub: "How to submit projects",
+    icon: IList,
+    tone: "purple",
+    question: "How do I submit my project tasks for review, and what happens after I submit?",
+  },
+  {
+    title: "Payment Support",
+    sub: "Fees & transactions",
+    icon: ICard,
+    tone: "orange",
+    question: "How does the certificate fee payment work, and how is it verified?",
+  },
+  {
+    title: "Other Questions",
+    sub: "Get instant help",
+    icon: IHelp,
+    tone: "blue",
+    question: "What kinds of questions can you help me with about CodeVantage?",
+  },
 ];
 
 function BotAvatar() {
   return (
-    <span className="cv-avatar">
+    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-blue-100 to-blue-50 text-blue-600 shadow-inner min-[420px]:h-12 min-[420px]:w-12">
       <IBot size={24} />
     </span>
   );
@@ -144,10 +192,12 @@ export default function ProjectChatbot() {
       role: "assistant",
       text: "I'm CodeVantage Assistant. I can help you with registration, program details, internship process, certificates, or any other questions.",
       greeting: true,
+      intro: true,
     },
     {
       role: "assistant",
       text: "How can I help you today?\nFeel free to ask anything! 😊",
+      intro: true,
     },
   ]);
   const [input, setInput] = useState("");
@@ -168,13 +218,30 @@ export default function ProjectChatbot() {
     }
   }, [messages, loading, open, minimized, hasUserMessage]);
 
-  async function sendQuestion(question) {
+  // Previous conversation (without the welcome messages) sent for context.
+  function buildHistory() {
+    return messages
+      .filter((m) => !m.intro)
+      .slice(-HISTORY_LIMIT)
+      .map((m) => ({ role: m.role, text: m.apiText ?? m.text }));
+  }
+
+  // question: the text sent to the chatbot.
+  // label:    optional text shown in the user's bubble (quick-help title).
+  // restoreInput: put the text back in the input box if the request fails.
+  async function sendQuestion(question, { label, restoreInput = false } = {}) {
     if (!question || loading) return;
 
-    setMessages((current) => [...current, { role: "user", text: question }]);
+    const history = buildHistory();
+    const userMessage = { role: "user", text: label ?? question, apiText: question };
+
+    setMessages((current) => [...current, userMessage]);
     setInput("");
     setError("");
     setLoading(true);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
     try {
       const response = await fetch(`${API_BASE}/chat`, {
@@ -182,7 +249,8 @@ export default function ProjectChatbot() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: question }),
+        body: JSON.stringify({ message: question, history }),
+        signal: controller.signal,
       });
 
       const responseText = await response.text();
@@ -208,54 +276,88 @@ export default function ProjectChatbot() {
 
       setMessages((current) => [...current, { role: "assistant", text: data.reply }]);
     } catch (err) {
-      setError(err.message || "Could not connect to the chatbot.");
+      // Take the failed message back out and give the user their text again,
+      // so they can simply press send once more.
+      setMessages((current) => current.filter((m) => m !== userMessage));
+      if (restoreInput) setInput(question);
+
+      if (err.name === "AbortError") {
+        setError("The server is taking too long to respond. It may be waking up, so please try again in a moment.");
+      } else {
+        setError(err.message || "Could not connect to the chatbot.");
+      }
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   }
 
   function handleSubmit(event) {
     event.preventDefault();
-    sendQuestion(input.trim());
+    sendQuestion(input.trim(), { restoreInput: true });
   }
 
   function renderMessage(message, index) {
     const isUser = message.role === "user";
     return (
       <div key={`${index}-${message.role}`}>
-        <div className={`cv-row ${isUser ? "cv-row-user" : ""}`}>
+        <div className={`flex items-start gap-3 ${isUser ? "justify-end" : "justify-start"}`}>
           {!isUser && <BotAvatar />}
-          <div className={`cv-bubble ${isUser ? "cv-bubble-user" : "cv-bubble-bot"}`}>
+          <div
+            className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-left text-[13px] leading-relaxed [overflow-wrap:anywhere] min-[420px]:text-sm ${
+              isUser
+                ? "rounded-br-md bg-blue-600 text-white"
+                : "rounded-tl-md bg-blue-50/75 text-[#0b1b4b]/90"
+            }`}
+          >
             {message.greeting && (
-              <p className="cv-hi">
+              <p className="mb-0.5 text-lg font-bold text-[#0b1b4b]">
                 Hi! <span aria-hidden="true">👋</span>
               </p>
             )}
             {message.text}
           </div>
         </div>
-        {!isUser && index < 2 && <p className="cv-time">Just now</p>}
+        {!isUser && index < 2 && (
+          <p className="ml-[52px] mt-1 text-xs text-slate-500 min-[420px]:ml-[60px]">Just now</p>
+        )}
       </div>
     );
   }
 
+  const panelHeight = minimized
+    ? "h-auto"
+    : expanded
+    ? "h-[min(720px,calc(100dvh_-_6rem))] min-h-[360px]"
+    : "h-[min(520px,calc(100dvh_-_8rem))] min-h-[360px]";
+
   return (
-    <div className={`cv-root ${expanded ? "cv-expanded" : ""}`}>
+    <div
+      className={`relative z-[1] mx-auto flex w-full flex-col items-stretch gap-3 font-sans text-[#0b1b4b] ${
+        expanded ? "max-w-[860px]" : "max-w-[640px]"
+      }`}
+    >
       {open && (
-        <section className="cv-panel" aria-label="Project AI chatbot">
-          <header className="cv-header">
-            <span className="cv-logo">
+        <section
+          className={`flex w-full flex-col overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-[0_20px_60px_rgba(37,99,235,0.22)] ${panelHeight}`}
+          aria-label="Project AI chatbot"
+        >
+          {/* header */}
+          <header className="flex shrink-0 items-center gap-3 bg-gradient-to-r from-blue-700 via-blue-600 to-[#1e60f0] px-4 py-3.5 min-[420px]:px-5">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white">
               <LogoMark />
             </span>
-            <div className="cv-head-text">
-              <h2>CodeVantage Assistant</h2>
-              <p>
-                <span className="cv-online" /> Online
+            <div className="min-w-0 flex-1 text-left">
+              <h2 className="m-0 truncate text-[17px] font-semibold text-white min-[420px]:text-lg">
+                CodeVantage Assistant
+              </h2>
+              <p className="m-0 flex items-center gap-2 text-sm text-white/90">
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 ring-2 ring-white/60" /> Online
               </p>
             </div>
             <button
               type="button"
-              className="cv-hbtn"
+              className="flex cursor-pointer rounded-lg p-1.5 text-white/90 transition-colors hover:bg-white/15 hover:text-white"
               onClick={() => setMinimized((v) => !v)}
               aria-label={minimized ? "Expand chat" : "Minimize chat"}
             >
@@ -263,43 +365,60 @@ export default function ProjectChatbot() {
             </button>
             <button
               type="button"
-              className="cv-hbtn cv-hide-sm"
+              className="hidden cursor-pointer rounded-lg p-1.5 text-white/90 transition-colors hover:bg-white/15 hover:text-white min-[420px]:flex"
               onClick={() => setExpanded((v) => !v)}
               aria-label={expanded ? "Shrink chat" : "Enlarge chat"}
             >
               {expanded ? <IShrink /> : <IMax />}
             </button>
-            <button type="button" className="cv-hbtn" onClick={() => setOpen(false)} aria-label="Close chat">
+            <button
+              type="button"
+              className="flex cursor-pointer rounded-lg p-1.5 text-white/90 transition-colors hover:bg-white/15 hover:text-white"
+              onClick={() => setOpen(false)}
+              aria-label="Close chat"
+            >
               <IClose />
             </button>
           </header>
 
           {!minimized && (
             <>
-              <div className="cv-messages" aria-live="polite">
+              {/* messages */}
+              <div
+                className="flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto px-4 pb-2 pt-4 min-[420px]:gap-4 min-[420px]:px-5"
+                aria-live="polite"
+              >
                 {messages.slice(0, 1).map((m, i) => renderMessage(m, i))}
 
                 {!hasUserMessage && (
-                  <div>
-                    <p className="cv-qh-title">Quick Help</p>
-                    <p className="cv-qh-sub">Choose a topic or type your question below.</p>
-                    <div className="cv-grid">
-                      {QUICK_HELP.map(({ title, sub, icon: Ico, tone }) => (
+                  <div className="text-left">
+                    <p className="m-0 text-lg font-bold">Quick Help</p>
+                    <p className="m-0 mb-3 text-[13px] text-slate-500">
+                      Choose a topic or type your question below.
+                    </p>
+                    <div className="grid grid-cols-1 gap-2.5 min-[420px]:grid-cols-2">
+                      {QUICK_HELP.map(({ title, sub, icon: Ico, tone, question }) => (
                         <button
                           key={title}
                           type="button"
-                          className="cv-card"
+                          className="flex w-full cursor-pointer items-center gap-2 rounded-2xl border border-slate-200 bg-white p-2 text-left shadow-sm transition hover:border-blue-600/40 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
                           disabled={loading}
-                          onClick={() => sendQuestion(title)}
+                          onClick={() => sendQuestion(question, { label: title })}
                         >
-                          <span className={`cv-card-icon cv-tone-${tone}`}>
+                          <span
+                            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] ${TONES[tone]}`}
+                          >
                             <Ico size={18} />
                           </span>
-                          <span className="cv-card-text">
-                            <span className="cv-card-title">{title}</span>
-                            <span className="cv-card-sub">{sub}</span>
+                          <span className="block min-w-0 flex-1">
+                            <span className="block truncate text-[13px] font-semibold leading-tight text-[#0b1b4b]">
+                              {title}
+                            </span>
+                            <span className="block truncate text-[11px] leading-tight text-slate-500">
+                              {sub}
+                            </span>
                           </span>
-                          <IChevron size={14} className="cv-card-chev" />
+                          <IChevron size={14} className="shrink-0 text-blue-600" />
                         </button>
                       ))}
                     </div>
@@ -309,25 +428,28 @@ export default function ProjectChatbot() {
                 {messages.slice(1).map((m, i) => renderMessage(m, i + 1))}
 
                 {loading && (
-                  <div className="cv-row">
+                  <div className="flex items-start gap-3">
                     <BotAvatar />
-                    <div className="cv-bubble cv-bubble-bot cv-muted">Thinking…</div>
+                    <div className="max-w-[85%] rounded-2xl rounded-tl-md bg-blue-50/75 px-4 py-2.5 text-left text-[13px] leading-relaxed text-slate-500 min-[420px]:text-sm">
+                      Thinking…
+                    </div>
                   </div>
                 )}
                 <div ref={bottomRef} />
               </div>
 
               {error && (
-                <p className="cv-error" role="alert">
+                <p className="m-0 shrink-0 px-4 pb-2 text-left text-xs text-red-600 min-[420px]:px-5" role="alert">
                   {error}
                 </p>
               )}
 
-              <form className="cv-form" onSubmit={handleSubmit}>
-                <div className="cv-input-wrap">
-                  <IClip size={20} className="cv-clip" />
+              {/* input */}
+              <form className="shrink-0 px-4 pb-4 pt-2 min-[420px]:px-5" onSubmit={handleSubmit}>
+                <div className="flex items-center gap-3 rounded-2xl border border-slate-200 bg-white py-1.5 pl-4 pr-1.5 focus-within:ring-2 focus-within:ring-blue-600/30">
+                  <IClip size={20} className="shrink-0 text-slate-500" />
                   <input
-                    className="cv-input"
+                    className="min-w-0 flex-1 bg-transparent text-base text-[#0b1b4b] outline-none placeholder:text-slate-500"
                     value={input}
                     onChange={(event) => setInput(event.target.value)}
                     placeholder="Type your message..."
@@ -335,13 +457,18 @@ export default function ProjectChatbot() {
                     maxLength={1000}
                     disabled={loading}
                   />
-                  <button className="cv-send" type="submit" disabled={loading || !input.trim()} aria-label="Send">
+                  <button
+                    className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-full bg-blue-600 text-white shadow-[0_4px_10px_rgba(37,99,235,0.35)] transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 min-[420px]:h-11 min-[420px]:w-11"
+                    type="submit"
+                    disabled={loading || !input.trim()}
+                    aria-label="Send"
+                  >
                     <ISend size={20} />
                   </button>
                 </div>
-                <p className="cv-tip">
-                  <IBulb size={15} />
-                  Tip: You can ask about registration, programs, certificates, or any support.
+                <p className="m-0 mt-2.5 flex items-start justify-center gap-2 text-center text-[11px] leading-snug text-slate-500 min-[420px]:items-center min-[420px]:text-xs">
+                  <IBulb size={15} className="shrink-0" />
+                  <span>Tip: You can ask about registration, programs, certificates, or any support.</span>
                 </p>
               </form>
             </>
@@ -349,11 +476,17 @@ export default function ProjectChatbot() {
         </section>
       )}
 
-      <div className="cv-launch-row">
-        <span className="cv-pill">
-          <strong>Need Help?</strong>
-          <small>Chat with us</small>
-          <svg className="cv-arrow" viewBox="0 0 48 16" fill="none" aria-hidden="true">
+      {/* launcher */}
+      <div className="flex items-center gap-3">
+        <span className="relative hidden rounded-full bg-white px-5 py-2 text-left leading-tight shadow-[0_8px_24px_rgba(15,23,42,0.14)] min-[420px]:inline-block">
+          <strong className="block text-sm font-bold text-[#0b1b4b]">Need Help?</strong>
+          <small className="block text-xs text-slate-500">Chat with us</small>
+          <svg
+            className="absolute -bottom-3 right-0 w-12 text-blue-600"
+            viewBox="0 0 48 16"
+            fill="none"
+            aria-hidden="true"
+          >
             <path
               d="M2 4 C14 16 30 16 44 6 M38 4 L45 5.5 L41 11"
               stroke="currentColor"
@@ -365,7 +498,7 @@ export default function ProjectChatbot() {
         </span>
         <button
           type="button"
-          className="cv-launch"
+          className="relative flex h-14 w-14 cursor-pointer items-center justify-center rounded-full bg-blue-600 text-white shadow-[0_10px_30px_rgba(37,99,235,0.45)] transition-transform hover:scale-105 sm:h-16 sm:w-16"
           onClick={() => {
             setOpen((v) => !v);
             setMinimized(false);
@@ -373,7 +506,7 @@ export default function ProjectChatbot() {
           aria-label={open ? "Close chat" : "Open chat"}
         >
           <IChat size={28} />
-          <span className="cv-launch-dot" />
+          <span className="absolute bottom-1 right-1 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500" />
         </button>
       </div>
     </div>
