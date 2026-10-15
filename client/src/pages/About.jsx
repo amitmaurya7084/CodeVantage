@@ -26,16 +26,16 @@ import { fetchContent } from "../services/contentService";
 
 const DEFAULTS = {
   "about.mission": {
-    text: "To bridge the gap between academic learning and real-world development skills by giving students structured, project-based work with genuine review and feedback.",
+    text: "To bridge the gap between academic learning and real-world development skills by giving students structured, project-based work with genuine review and feedback. We don’t believe in “pay and get a certificate” — every submission is actually looked at, actually critiqued, and actually improved before it’s marked complete. Our goal is to make sure that when a student lists “CodeVantage Internship” on their resume, it means they shipped real, working code that someone else checked.",
   },
   "about.vision": {
-    text: "A world where anyone motivated to learn can build a credible, project-based portfolio — regardless of their starting point.",
+    text: "A world where anyone motivated to learn can build a credible, project-based portfolio — regardless of their starting point. We want geography, college tier, or financial background to stop being the deciding factor in who gets real-world experience. If you’re willing to put in the work, CodeVantage should be the place that gives you a fair, structured shot at proving it.",
   },
   "about.values": {
     items: [
-      "Honesty — no inflated claims, no fake numbers",
-      "Rigor — certificates are earned through real review, not just payment",
-      "Accessibility — virtual, self-paced, and affordable",
+      "Honesty — No inflated claims, no fake numbers. What we promise is what we deliver, nothing dressed up.",
+      "Rigor — Certificates are earned through real review, not just payment. Every submission goes through an actual evaluation process.",
+      "Accessibility — Virtual, self-paced, and affordable, so cost or location never becomes the reason someone can’t start.",
     ],
   },
   "about.whatWeOffer": {
