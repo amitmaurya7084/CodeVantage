@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
 import {
-  ArrowRight, PlayCircle, Boxes, Wallet, FolderGit2,ClipboardCheck, TrendingUp, GraduationCap, Users, Handshake, Code2, Award,
-  Sparkles, Monitor, ShieldCheck, ChevronLeft, ChevronRight, Star,UserPlus, ListChecks, ClipboardList, Code, UploadCloud, Search, BadgeCheck,
-  CheckCircle2, GitBranch, Link2, Eye, FileText,Send, LayoutGrid, BookOpen, FolderOpen, BarChart3, Rocket, FileBadge,
+  ArrowRight, PlayCircle, Boxes, Wallet, FolderGit2, ClipboardCheck, TrendingUp, GraduationCap, Users, Handshake, Code2, Award,
+  Sparkles, Monitor, ShieldCheck, ChevronLeft, ChevronRight, Star, UserPlus, ListChecks, ClipboardList, Code, UploadCloud, Search, BadgeCheck,
+  CheckCircle2, GitBranch, Link2, Eye, FileText, Send, LayoutGrid, BookOpen, FolderOpen, Plus, Rocket, BarChart3, FileBadge,
 } from "lucide-react";
 import Button from "../components/ui/Button";
 import Badge from "../components/ui/Badge";
@@ -81,20 +81,20 @@ const testimonials = [
     initials: "PS",
   },
   {
-    name: "sandeep Verma",
+    name: "Sandeep Verma",
     role: "Python Intern",
     quote:
       "The task reviews actually taught me something every time. I finished the internship with three projects I'm proud to show.",
     rating: 5,
-    initials: "RV",
+    initials: "SV",
   },
   {
-    name: "Mayank agrawal",
+    name: "Mayank Agrawal",
     role: "JavaScript Intern",
     quote:
       "Flexible enough to fit around my college schedule, but structured enough that I always knew what to build next.",
     rating: 4,
-    initials: "AK",
+    initials: "MA",
   },
 ];
 
@@ -327,14 +327,13 @@ function Home() {
     <div className="overflow-x-hidden">
       <Seo path="/" />
       {/* Hero */}
-      <section className="relative overflow-hidden bg-[#FFFDF3]">
+      <section className="relative overflow-hidden bg-gradient-to-br from-white via-blue-50/70 to-white">
         {/* Decorative Background Shapes */}
         <div
           className="pointer-events-none absolute -top-24 -right-24 h-64 w-64 sm:h-96 sm:w-96 rounded-full bg-blue-100/70 blur-3xl"
-          aria-hidden="true"
-        />
+          aria-hidden="true"/>
         <div
-          className="pointer-events-none absolute -bottom-32 -left-32 h-64 w-64 sm:h-96 sm:w-96 rounded-full bg-amber-100/60 blur-3xl"
+          className="pointer-events-none absolute -bottom-32 -left-32 h-64 w-64 sm:h-96 sm:w-96 rounded-full bg-blue-100/60 blur-3xl"
           aria-hidden="true"
         />
         <div
@@ -343,23 +342,24 @@ function Home() {
         />
         {/* Main Container */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
-          <div className="lg:min-h-[650px] py-10 sm:py-14 lg:py-20 grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-8 xl:gap-12 items-center">
+          <div className="lg:min-h-[620px] py-10 sm:py-14 lg:pt-16 lg:pb-8 grid lg:grid-cols-[1fr_1.05fr] gap-8 sm:gap-10 lg:gap-6 xl:gap-8 items-center lg:items-start">
             {/* ============================================================
           LEFT CONTENT
       ============================================================ */}
-            <div className="relative z-20 text-center lg:text-left">
+            <div className="relative z-20 text-center lg:text-left lg:pt-10">
               {/* Badge */}
               <FadeIn direction="up" delay={0}>
                 <Badge
-                  className="mb-4 sm:mb-6 inline-flex max-w-full bg-blue-50 text-blue-700 border border-blue-100 shadow-sm text-[11px] sm:text-xs"
+                  className="mb-4 sm:mb-6 inline-flex max-w-full items-center gap-2 rounded-full bg-blue-50 text-blue-700 border border-blue-100 px-3.5 py-1.5 text-[11px] sm:text-sm font-medium"
                 >
+                  <GraduationCap className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
                   {hero.badge}
                 </Badge>
               </FadeIn>
               {/* Heading */}
               <FadeIn direction="up" delay={0.1}>
                 <h1
-                  className="text-[1.9rem] leading-[1.1] xs:text-3xl sm:text-4xl md:text-5xl lg:text-4xl xl:text-5xl font-bold text-navy sm:leading-[1.08] tracking-tight break-words">
+                  className="text-[2.1rem] leading-[1.08] xs:text-4xl sm:text-5xl md:text-6xl lg:text-5xl xl:text-[3.6rem] font-extrabold text-navy tracking-tight break-words">
                   <span>{hero.headingLine1}</span>
                   <br />
                   <span>
@@ -369,15 +369,22 @@ function Home() {
                   <span className="relative inline-block text-blue-600">
                     {line3Rest ? `${line3Rest} ` : ""}
                     {line3Last}
-                    {/* Yellow underline */}
-                    <span className="absolute left-0 right-0 -bottom-1 sm:-bottom-2 h-1 sm:h-1.5 rounded-full bg-amber-400"
-                      aria-hidden="true"/>
+                    {/* Blue hand-drawn underline */}
+                    <svg
+                      className="absolute left-0 -bottom-3 sm:-bottom-4 w-[70%] h-3 sm:h-4 text-blue-600"
+                      viewBox="0 0 260 16"
+                      fill="none"
+                      preserveAspectRatio="none"
+                      aria-hidden="true"
+                    >
+                      <path d="M3 11 C60 4 150 2 257 5 C170 7 90 10 40 14" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                   </span>
                 </h1>
               </FadeIn>
               {/* Description */}
               <FadeIn direction="up" delay={0.2}>
-                <p className="mt-5 sm:mt-6 mx-auto lg:mx-0 max-w-xl text-sm sm:text-base md:text-lg leading-relaxed text-slate-700">
+                <p className="mt-6 sm:mt-8 mx-auto lg:mx-0 max-w-xl text-sm sm:text-base md:text-lg leading-relaxed text-slate-600">
                   {hero.description}</p>
               </FadeIn>
               {/* CTA Buttons */}
@@ -387,7 +394,7 @@ function Home() {
                   {/* Primary */}
                   <Button
                     to="/register"
-                    size="lg" className="w-full xs:w-auto justify-center bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20"
+                    size="lg" className="w-full xs:w-auto justify-center rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/25"
                   >
                     {hero.ctaPrimaryText}  <ArrowRight className="h-4 w-4" />
                   </Button>
@@ -396,7 +403,7 @@ function Home() {
                     to="/how-it-works"
                     variant="outline"
                     size="lg"
-                    className="w-full xs:w-auto justify-center bg-white border-slate-200 text-navy hover:border-blue-500 hover:text-blue-600"
+                    className="w-full xs:w-auto justify-center rounded-lg bg-white/80 border-slate-300 text-navy hover:border-blue-500 hover:text-blue-600"
                   >
                     <PlayCircle className="h-4 w-4 text-blue-600" />
                     {hero.ctaSecondaryText}
@@ -407,15 +414,15 @@ function Home() {
             HIGHLIGHTS
         ========================================================= */}
               <motion.div
-                className="mt-8 sm:mt-12 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-5 sm:gap-6 max-w-md sm:max-w-2xl mx-auto lg:mx-0 text-left"
+                className="mt-8 sm:mt-10 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-5 sm:gap-4 max-w-md sm:max-w-2xl mx-auto lg:mx-0 text-left"
                 variants={staggerContainer}
                 initial="hidden"
                 animate="show"
               >
                 {heroHighlights.map((h) => (
-                  <motion.div key={h.label} variants={staggerItem} className="flex items-start gap-2 sm:gap-2.5">
+                  <motion.div key={h.label} variants={staggerItem} className="flex items-center gap-2.5">
                     <span
-                      className="flex h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+                      className="flex h-10 w-10 sm:h-11 sm:w-11 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                       <h.icon className="h-4 w-4 sm:h-5 sm:w-5" aria-hidden="true"/></span>
                     <p className="text-xs sm:text-sm text-slate-700 font-medium leading-snug">
                       {h.label}</p>
@@ -431,13 +438,13 @@ function Home() {
                 initial="hidden"
                 animate="show"
               >
-                {heroStats.map((stat) => (
+                {heroStats.map((stat, i) => (
                   <motion.div
                     key={stat.label}
                     variants={staggerItem}
-                    className="flex items-center gap-3 bg-white border border-slate-200 rounded-xl p-3 sm:p-4 shadow-sm">
+                    className="flex items-center gap-3 bg-white border border-slate-100 rounded-xl p-3 sm:p-4 shadow-md">
                     <span
-                      className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white"
+                      className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-white ${["bg-blue-600", "bg-emerald-500", "bg-amber-500"][i % 3]}`}
                     >
                       <stat.icon
                         className="h-5 w-5"
@@ -465,70 +472,125 @@ function Home() {
               className="relative"
             >
               <div
-                className="relative mx-auto w-full max-w-md sm:max-w-xl lg:max-w-none min-h-[340px] xs:min-h-[380px] sm:min-h-[460px] lg:min-h-[560px]"
+                className="relative mx-auto w-full max-w-md sm:max-w-xl lg:max-w-none min-h-[470px] xs:min-h-[490px] sm:min-h-[620px] lg:min-h-[580px]"
               >
                 {/* ========================================================
-              BLUE / YELLOW BACKGROUND SHAPES
+              SOFT BACKGROUND SHAPES
           ======================================================== */}
                 <div
-                  className="absolute top-8 right-2 sm:top-10 sm:right-10 w-44 h-44 sm:w-72 sm:h-72 rounded-full bg-blue-100 blur-2xl"
+                  className="absolute top-8 right-2 sm:top-10 sm:right-10 w-44 h-44 sm:w-72 sm:h-72 rounded-full bg-blue-100/80 blur-2xl"
                   aria-hidden="true"
                 />
+                {/* ========================================================
+              HANDWRITTEN NOTE — "Learn by Doing"
+          ======================================================== */}
                 <div
-                  className="absolute top-20 right-8 sm:top-28 sm:right-20 w-32 h-32 sm:w-56 sm:h-56 rounded-full bg-amber-300/70 blur-xl"
+                  className="pointer-events-none absolute -left-16 -top-2 z-30 hidden xl:block -rotate-12 text-navy"
+                  style={{ fontFamily: "CertSignature, 'Caveat', cursive", fontSize: "1.5rem", lineHeight: 1.05 }}
                   aria-hidden="true"
-                />
+                >
+                  Learn by
+                  <br />
+                  <span className="ml-4 inline-block">Doing</span>
+                  <svg className="ml-8 mt-1 h-9 w-9 text-blue-600" viewBox="0 0 40 40" fill="none">
+                    <path d="M6 6 C4 22 14 32 26 28 C34 24 28 14 22 20 C20 22 24 26 34 24" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+                  </svg>
+                </div>
                 {/* ========================================================
               CODE EDITOR
           ======================================================== */}
                 <div
-                  className="absolute top-8 sm:top-16 left-0 sm:left-4 lg:left-0 w-[62%] sm:w-[68%] z-10 rounded-xl sm:rounded-2xl overflow-hidden bg-slate-900 border border-slate-700 shadow-2xl"
+                  className="absolute top-4 sm:top-8 lg:top-12 left-0 sm:left-4 lg:left-6 w-[72%] sm:w-[58%] lg:w-[52%] xl:w-[46%] z-10 -rotate-3 rounded-xl sm:rounded-2xl bg-[#0f1b33] border border-slate-700 shadow-2xl"
                 >
+                  {/* JS badge */}
+                  <span className="absolute -top-3 right-3 z-10 rounded-lg bg-amber-400 px-2 py-1 text-[10px] sm:text-xs font-extrabold text-navy shadow-md">
+                    JS
+                  </span>
                   {/* Browser Bar */}
                   <div
-                    className="flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-3 bg-slate-800 border-b border-white/5"
+                    className="flex items-center gap-1.5 px-3 sm:px-4 py-2 sm:py-3 border-b border-white/5 rounded-t-xl sm:rounded-t-2xl"
                   >
                     <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-red-400" />
                     <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-amber-400" />
                     <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-green-400" />
-                    <span className="ml-2 sm:ml-3 text-[9px] sm:text-[11px] text-slate-400 truncate">
+                    <span className="ml-2 sm:ml-3 text-[9px] sm:text-[11px] text-slate-300 truncate">
                       project-task-03.jsx
                     </span>
                   </div>
-                  {/* Code Lines */}
-                  <div className="p-3 sm:p-6 space-y-2 sm:space-y-3 font-mono">
-                    <div className="h-2.5 sm:h-3 rounded bg-cyan/40 w-2/5" />
+                  {/* Code Lines (decorative) */}
+                  <div className="p-2 sm:p-4 font-mono text-[6px] sm:text-[9px] lg:text-[8.2px] xl:text-[10px] leading-[1.8] text-slate-200 overflow-hidden" aria-hidden="true">
+                    {[
+                      <><span className="text-pink-400">import</span> React, {"{"} <span className="text-cyan-300">useState</span> {"}"} <span className="text-pink-400">from</span> <span className="text-amber-300">'react'</span>;</>,
+                      <><span className="text-pink-400">function</span> <span className="text-cyan-300">Project</span>() {"{"}</>,
+                      <>&nbsp;&nbsp;<span className="text-pink-400">const</span> [task, setTask] = <span className="text-cyan-300">useState</span>(<span className="text-amber-300">''</span>);</>,
+                      <>&nbsp;&nbsp;<span className="text-pink-400">return</span> (</>,
+                      <>&nbsp;&nbsp;&nbsp;&nbsp;{"<"}<span className="text-cyan-300">div</span> <span className="text-amber-300">className</span>=<span className="text-green-300">"p-4"</span>{">"}</>,
+                      <>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{"<"}<span className="text-cyan-300">h2</span>{">"}Build Something Amazing{"</"}<span className="text-cyan-300">h2</span>{">"}</>,
+                      <>&nbsp;&nbsp;&nbsp;&nbsp;{"</"}<span className="text-cyan-300">div</span>{">"}</>,
+                      <>&nbsp;&nbsp;);</>,
+                      <>{"}"}</>,
+                      <><span className="text-pink-400">export default</span> Project;</>,
+                    ].map((line, i) => (
+                      <div key={i} className="flex gap-3 whitespace-nowrap">
+                        <span className="w-3 flex-shrink-0 text-right text-slate-500">{i + 1}</span>
+                        <span>{line}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
                 {/* ========================================================
-              STUDENT / LAPTOP IMAGE
+              STUDENT / LAPTOP IMAGE  (IMAGE SLOT)
           ======================================================== */}
                 <div
-                  className="absolute bottom-6 sm:bottom-14 right-0 sm:right-6 lg:right-16 w-[88%] sm:w-[90%] lg:w-[90%] z-20" >
+                  className="absolute bottom-0 right-0 lg:right-[9%] w-[96%] sm:w-[96%] lg:w-[92%] z-20 mix-blend-multiply" >
                   <img
-                    src="/images/hero-student.png"
+                    src={HERO_IMAGE}
                     alt="Student working on real-world projects"
                     decoding="async"
-                    className="block w-full h-auto max-h-[340px] sm:max-h-none object-contain object-bottom drop-shadow-2xl"
+                    className="block w-full h-auto max-h-[340px] sm:max-h-none object-contain object-bottom"
+                    style={{
+                      /* feathers the photo's left / right / top edges so no white box shows */
+                      WebkitMaskImage: "linear-gradient(to right, transparent, #000 12%, #000 90%, transparent), linear-gradient(to bottom, transparent, #000 12%)",
+                      maskImage: "linear-gradient(to right, transparent, #000 12%, #000 90%, transparent), linear-gradient(to bottom, transparent, #000 12%)",
+                      WebkitMaskComposite: "source-in",
+                      maskComposite: "intersect",
+                    }}
                   />
+                </div>
+                {/* ========================================================
+              HANDWRITTEN NOTE — "Turn Ideas into Real Projects"
+          ======================================================== */}
+                <div
+                  className="pointer-events-none absolute -left-5 top-[57%] z-30 hidden lg:block -rotate-[14deg] text-navy"
+                  style={{ fontFamily: "CertSignature, 'Caveat', cursive", fontSize: "1.45rem", lineHeight: 1.05 }}
+                  aria-hidden="true"
+                >
+                  Turn Ideas
+                  <br />
+                  <span className="ml-3 inline-block">into Real</span>
+                  <br />
+                  <span className="ml-6 inline-block">Projects</span>
+                  <svg className="-ml-1 mt-1 h-10 w-14 text-blue-600" viewBox="0 0 56 40" fill="none">
+                    <path d="M4 4 C0 24 14 36 40 32 M33 27 L42 32 L35 38" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
                 </div>
                 {/* ========================================================
               FLOATING STATS (laptop/desktop only — tablet & mobile use the stat cards on the left)
           ======================================================== */}
                 <motion.div
-                  className="absolute top-0 right-0 lg:-right-6 z-30 hidden lg:flex flex-col gap-3 w-52"
+                  className="absolute top-0 right-0 lg:-right-2 xl:-right-6 z-30 hidden lg:flex flex-col gap-2.5 w-48 xl:w-52"
                   variants={staggerContainer}
                   initial="hidden"
                   animate="show"
                 >
-                  {heroStats.map((stat) => (
+                  {heroStats.map((stat, i) => (
                     <motion.div
                       key={stat.label}
                       variants={staggerItem}
-                      className="flex items-center gap-3 bg-white rounded-xl p-3.5 border border-slate-100 shadow-lg"
+                      className="flex items-center gap-2.5 bg-white rounded-xl p-2.5 border border-slate-100 shadow-lg"
                     >
                       <span
-                        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white"
+                        className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl text-white ${["bg-blue-600", "bg-emerald-500", "bg-amber-500"][i % 3]}`}
                       >
                         <stat.icon
                           className="h-5 w-5"
@@ -536,7 +598,7 @@ function Home() {
                         />
                       </span>
                       <div className="min-w-0">
-                        <p className="text-navy font-bold leading-none text-base">
+                        <p className="text-navy font-bold leading-none text-lg">
                           {stat.value}
                         </p>
                         <p className="text-slate-600 text-xs mt-1 leading-snug">
@@ -547,27 +609,39 @@ function Home() {
                   ))}
                 </motion.div>
                 {/* ========================================================
-              FLOATING PROJECT CARD
+              FLOATING MENTORS CARD
           ======================================================== */}
                 <FadeIn
                   direction="up"
                   delay={0.6}
-                  className="absolute bottom-2 sm:bottom-8 left-0 sm:left-2 lg:-left-6 z-40"
+                  className="absolute lg:top-[56%] right-0 lg:-right-4 xl:-right-10 z-40 hidden lg:block"
                 >
                   <div
-                    className="flex items-center gap-2.5 sm:gap-3 bg-white rounded-xl p-2.5 sm:p-4 shadow-xl border border-slate-100 w-44 sm:w-56"
+                    className="bg-white rounded-2xl p-3 sm:p-3.5 shadow-xl border border-slate-100 w-48 sm:w-52"
                   >
-                    <span
-                      className="flex h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600"
-                    >
-                      <Handshake
-                        className="h-5 w-5"
-                        aria-hidden="true"
-                      />
-                    </span>
-                    <p className="text-navy text-xs sm:text-sm font-semibold leading-snug">
-                      Turn Your Ideas Into Real Projects
-                    </p>
+                    {/* IMAGE SLOTS — mentor avatars */}
+                    <div className="flex items-center">
+                      {["from-amber-200 to-amber-400", "from-rose-200 to-rose-400", "from-sky-200 to-sky-400"].map((g, i) => (
+                        <span
+                          key={i}
+                          className={`-ml-2 first:ml-0 h-8 w-8 sm:h-9 sm:w-9 rounded-full border-2 border-white bg-gradient-to-br ${g}`}
+                        />
+                      ))}
+                      <span className="-ml-2 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-full border-2 border-white bg-blue-50 text-blue-600">
+                        <Plus className="h-4 w-4" aria-hidden="true" />
+                      </span>
+                    </div>
+                    <div className="mt-1 flex items-end justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-navy text-xs sm:text-sm font-semibold leading-snug">
+                          Learn with Expert Mentors
+                        </p>
+                        <p className="mt-0.5 text-[11px] sm:text-xs text-slate-500 leading-snug">
+                          Get guidance, feedback and career support.
+                        </p>
+                      </div>
+                      <ArrowRight className="h-4 w-4 flex-shrink-0 text-blue-600" aria-hidden="true" />
+                    </div>
                   </div>
                 </FadeIn>
                 {/* ========================================================
@@ -581,8 +655,32 @@ function Home() {
             </FadeIn>
           </div>
         </div>
+
+        {/* ============================================================
+          BOTTOM FEATURE STRIP
+      ============================================================ */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 pb-6 sm:pb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-0 lg:divide-x divide-slate-200 rounded-2xl bg-white border border-slate-100 shadow-lg px-5 sm:px-6 py-5">
+            {[
+              { icon: Rocket, title: "Hands-On Learning", text: "Work on real projects, not just theory.", tone: "bg-orange-50 text-orange-500" },
+              { icon: Users, title: "Industry Guidance", text: "Learn from experienced mentors.", tone: "bg-blue-50 text-blue-600" },
+              { icon: BadgeCheck, title: "Verified Certificates", text: "Showcase your skills with confidence.", tone: "bg-emerald-50 text-emerald-500" },
+              { icon: BarChart3, title: "Better Career Opportunities", text: "Build a strong portfolio and get noticed.", tone: "bg-purple-50 text-purple-600" },
+            ].map((f) => (
+              <div key={f.title} className="flex items-center gap-3.5 lg:px-5 first:lg:pl-0 last:lg:pr-0">
+                <span className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full ${f.tone}`}>
+                  <f.icon className="h-5 w-5" aria-hidden="true" />
+                </span>
+                <div className="min-w-0">
+                  <p className="font-semibold text-navy text-sm sm:text-base leading-snug">{f.title}</p>
+                  <p className="text-xs sm:text-sm text-slate-500 leading-snug">{f.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
-      
+
       {/* Technologies & Tools */}
 
       <section className="pt-14 pb-8 sm:pt-16 sm:pb-10 bg-white border-b border-slate-100">
@@ -591,8 +689,8 @@ function Home() {
 
             {/* Heading - Top */}
             <div className="text-center mb-5 sm:mb-7">
-              <p className="text-base sm:text-xl font-bold text-navy">
-                Technologies I ’ll Work With
+              <p className="text-base sm:text-xl font-bold text-navy px-2">
+                Technologies I&apos;ll Work With
               </p>
             </div>
 
@@ -647,7 +745,7 @@ function Home() {
                 return (
                   <div
                     key={tool}
-                    className="flex flex-col items-center justify-center gap-2 md:min-w-[70px]"
+                    className="flex min-w-0 flex-col items-center justify-center gap-2 md:min-w-[70px]"
                   >
                     <div className="h-12 w-12 sm:h-14 sm:w-14 lg:h-16 lg:w-16 flex items-center justify-center">
                       {iconMap[tool] ? (
@@ -664,7 +762,7 @@ function Home() {
                       )}
                     </div>
 
-                    <span className="text-xs sm:text-sm font-medium text-navy text-center whitespace-nowrap">
+                    <span className="text-xs sm:text-sm font-medium text-navy text-center leading-tight break-words sm:whitespace-nowrap">
                       {tool}
                     </span>
                   </div>
@@ -679,7 +777,7 @@ function Home() {
       {/* Programs */}
       <section className="py-12 sm:py-20 bg-surface">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10">
-          <Reveal className="flex items-end justify-between flex-wrap gap-4">
+          <Reveal className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-2">
             <SectionHeading
               eyebrow="Popular Programs"
               title="Our Internship Programs"
@@ -691,7 +789,7 @@ function Home() {
             </Button>
           </Reveal>
           <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-stretch"
             variants={staggerContainer}
             initial="hidden"
             whileInView="show"
@@ -748,7 +846,7 @@ function Home() {
           </Reveal>
 
           <motion.div
-            className="grid grid-cols-1 gap-x-8 gap-y-5 sm:gap-y-6 sm:grid-cols-2 lg:grid-cols-4"
+            className="grid grid-cols-1 gap-x-8 gap-y-5 sm:gap-y-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
             variants={staggerContainer}
             initial="hidden"
             whileInView="show"
@@ -757,18 +855,27 @@ function Home() {
             {howItWorksSteps.map((step, i) => (
               <motion.div key={step.title} variants={staggerItem} className="relative">
                 <div className="h-full rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md">
-                  <div className={`relative h-32 overflow-hidden rounded-xl ${STEP_TINTS[i % STEP_TINTS.length]}`}>
+                  <div className={`relative h-32 sm:h-36 overflow-hidden rounded-xl ${STEP_TINTS[i % STEP_TINTS.length]}`}>
                     <span className="absolute left-2 top-2 z-10 inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand text-sm font-bold text-white ring-2 ring-white">
                       {i + 1}
                     </span>
                     <StepArt index={i} Icon={STEP_ICONS[i % STEP_ICONS.length]} />
                   </div>
-                  <p className="mt-3 text-base sm:text-lg font-bold text-navy">{step.title}</p>
+                  <p className="mt-3 text-base sm:text-lg font-bold text-navy break-words">{step.title}</p>
                   <p className="mt-1 text-sm leading-relaxed text-muted">{step.description}</p>
                 </div>
+                {/* Arrow between cards — 3 per row at lg, 4 per row at xl */}
+                {i % 3 !== 2 && i !== howItWorksSteps.length - 1 && (
+                  <span
+                    className="absolute -right-[1.4rem] top-[30%] z-10 hidden h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-brand ring-4 ring-white lg:inline-flex xl:hidden"
+                    aria-hidden="true"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </span>
+                )}
                 {i % 4 !== 3 && i !== howItWorksSteps.length - 1 && (
                   <span
-                    className="absolute -right-[1.4rem] top-[30%] z-10 hidden h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-brand ring-4 ring-white lg:inline-flex"
+                    className="absolute -right-[1.4rem] top-[30%] z-10 hidden h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-brand ring-4 ring-white xl:inline-flex"
                     aria-hidden="true"
                   >
                     <ChevronRight className="h-4 w-4" />
@@ -867,7 +974,7 @@ function Home() {
                   {activeTestimonial.initials}
                 </span>
                 <div className="min-w-0">
-                  <p className="text-sm sm:text-base text-navy/90 leading-relaxed">&ldquo;{activeTestimonial.quote}&rdquo;</p>
+                  <p className="text-sm sm:text-base text-navy/90 leading-relaxed break-words">&ldquo;{activeTestimonial.quote}&rdquo;</p>
                   <p className="font-semibold text-navy mt-3">{activeTestimonial.name}</p>
                   <p className="text-sm text-muted">{activeTestimonial.role}</p>
                   <div className="flex items-center gap-0.5 mt-2">
@@ -916,7 +1023,7 @@ function Home() {
       </section>
 
       {/* Final CTA */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#FFFDF7] via-[#FFF9E8] to-[#FFF3D1] py-2 sm:py-4 lg:py-6">
+      <section className="relative overflow-hidden bg-gradient-to-br from-[#FFFDF7] via-[#FFF9E8] to-[#FFF3D1] py-10 sm:py-14 lg:py-10">
         {/* soft background blobs */}
         <div className="pointer-events-none absolute -left-24 bottom-0 h-72 w-72 rounded-full bg-blue-100/60 blur-3xl" />
         <div className="pointer-events-none absolute right-[8%] top-10 h-80 w-80 rounded-full bg-amber-100/70 blur-3xl" />
@@ -926,11 +1033,11 @@ function Home() {
             {/* ── Left: copy, buttons, features ── */}
             <div className="min-w-0 text-center lg:text-left">
               <Reveal>
-                <span className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-full bg-amber-100/80 px-4 py-2 text-xs sm:text-sm font-medium text-amber-600">
+                <span className="inline-flex flex-wrap items-center justify-center gap-x-2 gap-y-1 rounded-2xl sm:rounded-full bg-amber-100/80 px-4 py-2 text-center text-xs sm:text-sm font-medium text-amber-600">
                   <GraduationCap className="h-4 w-4" />
                   Practical Learning <span>•</span> Real Projects <span>•</span> Career Ready
                 </span>
-                <h2 className="mt-5 text-3xl sm:text-5xl xl:text-[46px] font-extrabold leading-[1.1] text-navy tracking-tight">
+                <h2 className="mt-5 text-[1.75rem] xs:text-3xl sm:text-4xl md:text-5xl lg:text-[40px] xl:text-[46px] font-extrabold leading-[1.1] text-navy tracking-tight break-words">
                   {String(finalCta.heading)
                     .split(/(Learning)/)
                     .map((part, i) =>
@@ -943,7 +1050,7 @@ function Home() {
                       ),
                     )}
                 </h2>
-        <p className="mt-4 sm:mt-5 max-w-xl mx-auto lg:mx-0 text-base sm:text-lg text-slate-600 leading-relaxed">
+        <p className="mt-4 sm:mt-5 max-w-xl mx-auto lg:mx-0 text-sm sm:text-base md:text-lg text-slate-600 leading-relaxed">
                   {finalCta.description}
                 </p>
                 <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row flex-wrap justify-center lg:justify-start gap-3 sm:gap-4 max-w-md sm:max-w-none mx-auto lg:mx-0">
@@ -962,7 +1069,7 @@ function Home() {
 
               {/* Feature columns */}
               <motion.div
-                className="mt-8 sm:mt-10 grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-4 gap-x-0 gap-y-6 text-left"
+                className="mt-8 sm:mt-10 grid grid-cols-1 min-[480px]:grid-cols-2 md:grid-cols-4 lg:grid-cols-2 xl:grid-cols-4 gap-x-0 gap-y-6 text-left"
                 variants={staggerContainer}
                 initial="hidden"
                 whileInView="show"
@@ -983,17 +1090,17 @@ function Home() {
                     <span className={`h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center ${tone}`}>
                       <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
                     </span>
-                    <p className="font-semibold text-navy">{title}</p>
+                    <p className="font-semibold text-navy break-words">{title}</p>
                     <p className="text-sm text-slate-500 leading-snug">{sub}</p>
                   </motion.div>
                 ))}
               </motion.div>
             </div>
             {/* ── Right: student image + floating cards ── */}
-            <div className="relative mx-auto w-full max-w-md sm:max-w-lg lg:max-w-none aspect-[3/2.2] lg:aspect-[3/2.5]">
+            <div className="relative mx-auto w-full max-w-md sm:max-w-lg lg:max-w-none aspect-[4/3.6] sm:aspect-[4/3.3] lg:aspect-[3/2.5]">
               {/* soft yellow blob behind the photo */}
-              <div className="absolute rounded-[45%] bg-amber-100/70" />
-                <img src={HERO_IMAGE} alt="" className="h-80 w-full object-contain object-left-bottom" />
+              <div className="absolute inset-[8%] rounded-[45%] bg-amber-100/70" />
+              <img src={HERO_IMAGE} alt="" className="absolute inset-0 h-full w-full object-contain object-bottom" />
           
               {/* Floating cards (hidden on very small screens) */}
               {[
@@ -1004,10 +1111,10 @@ function Home() {
               ].map(({ icon: Icon, color, label, pos }) => (
                 <div
                   key={label.join(" ")}
-                  className={`hidden min-[480px]:flex absolute ${pos} flex-col gap-1.5 rounded-2xl bg-white px-3 py-2.5 sm:px-4 sm:py-3 shadow-lg shadow-slate-200/70`}
+                  className={`hidden min-[480px]:flex absolute ${pos} flex-col gap-1 sm:gap-1.5 rounded-xl sm:rounded-2xl bg-white px-2.5 py-2 sm:px-4 sm:py-3 shadow-lg shadow-slate-200/70`}
                 >
-                  <Icon className={`h-6 w-6 sm:h-8 sm:w-8 ${color}`} />
-                  <p className="text-xs sm:text-sm font-medium text-navy leading-tight">
+                  <Icon className={`h-5 w-5 sm:h-8 sm:w-8 ${color}`} />
+                  <p className="text-[11px] sm:text-sm font-medium text-navy leading-tight">
                     {label[0]}
                     <br />
                     {label[1]}
@@ -1022,4 +1129,3 @@ function Home() {
   );
 }
 export default Home;
-
