@@ -83,7 +83,7 @@ function Navbar() {
                 Login
               </Button>
               <Button to="/register" variant="primary" size="md">
-                Apply Now
+                Sign Up
               </Button>
             </>
           )}
@@ -146,7 +146,7 @@ function Navbar() {
                   Login
                 </Button>
                 <Button to="/register" variant="primary" onClick={() => setIsMenuOpen(false)}>
-                  Apply Now
+                  Sign Up
                 </Button>
               </>
             )}
